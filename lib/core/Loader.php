@@ -6,9 +6,6 @@
  *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-require_once "../lib/core/Bootstrap.php";
+class Loader {}
 
-import("core.Dispatcher");
-
-$dispatcher = new Dispatcher;
-$dispatcher->dispatch();
+function import() {}
