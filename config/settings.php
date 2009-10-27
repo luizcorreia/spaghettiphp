@@ -1,38 +1,37 @@
 <?php
 /**
- *  Esse é o arquivo das principais configurações do Spaghetti. Através delas,
- *  você pode configurar o comportamento do núcleo do Spaghetti.
+ *  Esse é o arquivo das principais configurações do Spaghetti*. Através delas,
+ *  você pode configurar o comportamento da sua aplicação.
  */
 
 /**
- *  defaultExtension define a extensão de arquivo padrão quando nenhuma outra for
- *  usada na URL da requisição. Desta maneira, seus arquivos de views deverão se chamar
- *  nome_do_arquivo.extensao.php
- */
-Config::write("defaultExtension", "htm");
+  *  App.environment define o ambiente em que sua aplicação se encontra. Geralmente
+  *  existem os environments development (para desenvolvimento), production (para
+  *  produção) e test (para testes automatizados).
+  */
+Config::write("App.environment", "development");
 
 /**
- *  Com o environment, você pode escolher qual ambiente de desenvolvimento está
- *  utilizando. É principalmente utilizado na configuração de banco de dados,
- *  evitando que você tenha que redefiní-las a cada deploy.
- */
-Config::write("environment", "development");
+  *  App.defaultExtension define qual a extensão de arquivo padrão o Spaghetti*
+  *  deverá usar caso nenhuma outra tenha sido definida.
+  */
+Config::write("App.defaultExtension", "htm");
 
 /**
- *  debugMode define o nível de mensagens de erro que você receberá enquanto
- *  estiver desenvolvendo.
- */
-Config::write("debugMode", 1);
+  *  App.encoding define o conjunto de caracteres usado pela aplicação.
+  */
+Config::write("App.encoding", "utf-8");
 
 /**
- *  appEncoding define a codificação a ser enviada ao navegador pela aplicação.
- */
-Config::write("appEncoding", "utf-8");
+  *  Debug.level define quais tipos de mensagem de erro devem ser mostradas. O valor
+  *  0 não mostra mensagem algum, e 1 mostra todos os erros.
+  */
+Config::write("Debug.level", 1);
 
 /**
- *  securitySalt é uma string usada na criptografia de dados. Esta string não
- *  tem limite de caracteres e aceita qualquer tipo de caracter.
- */
-Config::write("securitySalt", "12345678910111213141516");
+  *  Security.salt é uma string qualquer que precede dados criptografados, tornando
+  *  menos improvável a quebra de hashes usando rainbow tables.
+  */
+Config::write("Security.salt", "e6628645a7");
 
 ?>
