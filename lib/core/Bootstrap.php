@@ -23,12 +23,18 @@ $config_path = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . "conf
 require_once $config_path . "paths.php";
 
 /**
-  *  Inclui classes básicas para configuração.
+  *  Inclui algumas classes básicas.
   */
 require_once "core/Loader.php";
 import("core.Config");
+import("core.debug.Debug");
 
 /**
   *  Inclui arquivos de configuração.
   */
 import("config.settings");
+
+/**
+  *  Habilita error_reporting de acordo com Debug.level.
+  */
+Debug::errorReporting();
