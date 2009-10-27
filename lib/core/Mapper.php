@@ -7,7 +7,7 @@
  *
  */
 
-class Mapper extends Object {
+class Mapper {
     /**
      *  Definições de prefixos.
      */
