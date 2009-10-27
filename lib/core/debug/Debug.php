@@ -1,12 +1,19 @@
 <?php
 /**
- *  Short description.
+ *  Debug fornece algumas funções úteis para debug, como definir error_reporting e
+ *  mostrar representações legíveis de variáveis.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
 class Debug {
+    /**
+      *  Define error_reporting para mostrar erros de acordo com Debug.level.
+      *
+      *  @param integer $level Nível de erros a serem mostrados
+      *  @return void
+      */
     public static function errorReporting($level = null) {
         if(is_null($level)):
             $level = Config::read("Debug.level");
@@ -26,18 +33,42 @@ class Debug {
         endswitch;
         ini_set("error_reporting", $level);
     }
-    public static function pr() {
-        
+    /**
+      *  Formata e imprime o conteúdo de uma variável.
+      *
+      *  @param mixed $data Variável a ser impressa
+      *  @return void
+      */
+    public static function pr($data) {
+        echo "<pre>" . print_r($data, true) . "</pre>";
     }
-    public static function dump() {
-        
+    /**
+      *  Formata e imprime o conteúdo parseável de uma variável.
+      *
+      *  @param mixed $data Variável a ser impressa
+      *  @return void
+      */
+    public static function dump($data) {
+        self::pr(var_export($data, true));
     }
 }
 
-function pr() {
-    return Debug::pr();
+/**
+  *  Formata e imprime o conteúdo de uma variável.
+  *
+  *  @param mixed $data Variável a ser impressa
+  *  @return void
+  */
+function pr($data) {
+    Debug::pr($data);
 }
 
-function dump() {
-    return Debug::dump();
+/**
+  *  Formata e imprime o conteúdo parseável de uma variável.
+  *
+  *  @param mixed $data Variável a ser impressa
+  *  @return void
+  */
+function dump($data) {
+    Debug::dump($data);
 }
