@@ -5,7 +5,7 @@ import("core.Mapper");
 
 class MapperTest extends PHPUnit_Framework_TestCase {
     public function testMatch() {
-        $result = Mapper::match("/:controller/:action", "/controller/action");
+        $result = Mapper::match('/:controller/:action', '/controller/action');
         $this->assertTrue($result);
     }
 }

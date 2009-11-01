@@ -6,6 +6,8 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
+import('core.utils.String');
+
 class Mapper {
     /**
      *  Definições de prefixos.
@@ -187,12 +189,17 @@ class Mapper {
      *  @param string $url URL que checará a primeira
      *  @return boolean Verdadeiro se as URLs são correspondentes
      */
-    public static function match($check, $url = null) {
-        if(is_null($url)):
-            $url = self::here();
+    public static function match($check, $url) {
+        $check_string = String::insert($check, array(
+            'controller' => '([a-z-_]+)',
+            'action' => '([a-z-_]+)'
+        ));
+        $regex = '%' . $check_string . '%';
+        if(preg_match($regex, $url)):
+            return true;
+        else:
+            return false;
         endif;
-        $check = "%^" . str_replace(array(":any", ":fragment", ":num"), array("(.+)", "([^\/]+)", "([0-9]+)"), $check) . "/?$%";
-        return preg_match($check, $url);
     }
     /**
      *  Retorna a rota correspondente a uma URL.
