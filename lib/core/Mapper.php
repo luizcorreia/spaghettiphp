@@ -43,7 +43,7 @@ class Mapper {
                 $this->base = "/";
             endif;
         endif;
-        if(is_null($this->here)):
+        if(isset($_SERVER["REQUEST_URI"])):
             $start = strlen($this->base);
             $this->here = self::normalize(substr($_SERVER["REQUEST_URI"], $start));
         endif;
