@@ -29,7 +29,7 @@ class Mapper {
      *  Controller padrão da aplicação.
      */
     public $root = null;
-    public $defaults = false;
+    public $connectedDefaults = false;
 
     /**
      *  Define a URL base e URL atual da aplicação.
@@ -69,7 +69,7 @@ class Mapper {
         );
         Mapper::connect('/', $defaults, $regex);
         Mapper::connect('/:controller/:action', $defaults, $regex);
-        $this->defaults = true;
+        $this->connectedDefaults = true;
     }
     /**
      *  Getter para Mapper::here.
@@ -205,11 +205,7 @@ class Mapper {
         endif;
         $regex = '%^' . $check . '$%';
         
-        if(preg_match($regex, $url, $results)):
-            return true;
-        else:
-            return false;
-        endif;
+        return preg_match($regex, $url, $results) ? true : false;
     }
     /**
      *  Retorna a rota correspondente a uma URL.
@@ -236,7 +232,7 @@ class Mapper {
      */
     public static function parse($url = null) {
         $self = self::getInstance();
-        if(!$self->defaults):
+        if(!$self->connectedDefaults):
             $self->connectDefaults();
         endif;
         if(is_null($url)):
@@ -249,13 +245,14 @@ class Mapper {
                 array_shift($result);
                 $parsed = array();
                 $extracted = String::extract($route['url']);
-                foreach($extracted as $key => $value):
-                    $parsed[$value] = $result[$key];
+                foreach($extracted as $key => $name):
+                    $parsed[$name] = $result[$key];
                 endforeach;
-                break;
+                $parsed += $route['defaults'];
+                
+                return $parsed;
             endif;
         endforeach;
-        return $parsed;
     }
     /**
      *  Gera uma URL, levando em consideração o local atual da aplicação.
