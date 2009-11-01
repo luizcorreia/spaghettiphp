@@ -8,17 +8,18 @@
  * 
  */
 
-/**
- * Essa rota define o controller padrão de sua aplicação, aquele que o usuário
- * verá toda vez que acessar a raíz de seu sistema. Você pode escolher o controller
- * que mais fizer sentido para você
- */
-Mapper::root("home");
+import('core.Mapper');
 
-/**
- * Caso você precise de um painel de administração, você pode descomentar a linha
- * abaixo. Você também pode adicionar quantos prefixos mais forem necessários.
- */
-// Mapper::prefix("admin");
+Mapper::connect(
+    '/:controller/:action',
+    array(
+        'controller' => 'home',
+        'action' => 'index'
+    ),
+    array(
+        'controller' => '([a-z-_]+)',
+        'action' => '([a-z-_]+)'
+    )
+);
 
 ?>

@@ -27,6 +27,7 @@ import('core.debug.Debug');
   *  Inclui arquivos de configuração.
   */
 import('config.settings');
+import('config.routes');
 
 /**
   *  Habilita error_reporting de acordo com Debug.level.
