@@ -183,18 +183,22 @@ class Mapper {
         return true;
     }
     /**
-     *  Verifica se uma URL é equivalente a outra.
+     *  Verifica se uma expressão regular é equivalente a uma URL.
      *
-     *  @param string $check URL a ser checada
-     *  @param string $url URL que checará a primeira
-     *  @return boolean Verdadeiro se as URLs são correspondentes
+     *  @param string $check Expressão regular a ser checada
+     *  @param string $url URL usada na checagem
+     *  @return boolean Verdadeiro se a expressão regular conferir com a URL
      */
-    public static function match($check, $url) {
+    public static function match($check, $url = null) {
+        if(is_null($url)):
+            $url = Mapper::here();
+        endif;
         $check_string = String::insert($check, array(
             'controller' => '([a-z-_]+)',
             'action' => '([a-z-_]+)'
         ));
-        $regex = '%' . $check_string . '%';
+        $regex = '%^' . $check_string . '$%';
+        
         if(preg_match($regex, $url)):
             return true;
         else:
