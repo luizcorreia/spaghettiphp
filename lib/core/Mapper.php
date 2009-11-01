@@ -29,6 +29,7 @@ class Mapper {
      *  Controller padrão da aplicação.
      */
     public $root = null;
+    public $defaults = false;
 
     /**
      *  Define a URL base e URL atual da aplicação.
@@ -56,6 +57,19 @@ class Mapper {
         endif;
         
         return $instance;
+    }
+    public function connectDefaults() {
+        $defaults = array(
+            'controller' => 'home',
+            'action' => 'index'
+        );
+        $regex = array(
+            'controller' => '([a-z-_]+)',
+            'action' => '([a-z-_]+)'
+        );
+        Mapper::connect('/', $defaults, $regex);
+        Mapper::connect('/:controller/:action', $defaults, $regex);
+        $this->defaults = true;
     }
     /**
      *  Getter para Mapper::here.
@@ -221,11 +235,14 @@ class Mapper {
      *  @return array URL interpretada
      */
     public static function parse($url = null) {
+        $self = self::getInstance();
+        if(!$self->defaults):
+            $self->connectDefaults();
+        endif;
         if(is_null($url)):
             $url = self::here();
         endif;
         $url = self::normalize($url);
-        $self = self::getInstance();
         foreach($self->routes as $route):
             $check = String::insert($route['url'], $route['regex']);
             if(self::match($check, $url, $result)):

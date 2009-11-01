@@ -8,18 +8,4 @@
  * 
  */
 
-import('core.Mapper');
-
-Mapper::connect(
-    '/:controller/:action',
-    array(
-        'controller' => 'home',
-        'action' => 'index'
-    ),
-    array(
-        'controller' => '([a-z-_]+)',
-        'action' => '([a-z-_]+)'
-    )
-);
-
 ?>
