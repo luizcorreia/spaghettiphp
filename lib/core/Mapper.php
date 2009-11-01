@@ -53,6 +53,7 @@ class Mapper {
             $c = __CLASS__;
             $instance = new $c();
         endif;
+        
         return $instance;
     }
     /**
