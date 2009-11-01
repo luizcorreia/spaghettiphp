@@ -14,4 +14,8 @@ class String {
         endforeach;
         return $string;
     }
+    public static function extract($string) {
+        preg_match_all('%:([a-zA-Z-_]+)%', $string, $extracted);
+        return $extracted[1];
+    }
 }

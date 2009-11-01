@@ -185,13 +185,13 @@ class Mapper {
      *  @param string $url URL usada na checagem
      *  @return boolean Verdadeiro se a expressão regular conferir com a URL
      */
-    public static function match($check, $url = null) {
+    public static function match($check, $url = null, &$results = null) {
         if(is_null($url)):
             $url = self::here();
         endif;
         $regex = '%^' . $check . '$%';
         
-        if(preg_match($regex, $url)):
+        if(preg_match($regex, $url, $results)):
             return true;
         else:
             return false;
@@ -228,8 +228,13 @@ class Mapper {
         $self = self::getInstance();
         foreach($self->routes as $route):
             $check = String::insert($route['url'], $route['regex']);
-            if(self::match($check, $url)):
-                $parsed = array('controller' => 'home', 'action' => 'index');
+            if(self::match($check, $url, $result)):
+                array_shift($result);
+                $parsed = array();
+                $extracted = String::extract($route['url']);
+                foreach($extracted as $key => $value):
+                    $parsed[$value] = $result[$key];
+                endforeach;
                 break;
             endif;
         endforeach;

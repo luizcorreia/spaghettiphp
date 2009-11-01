@@ -22,4 +22,10 @@ class StringTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals($expected, $result);
     }
+    public function testExtract() {
+        $expected = array('controller', 'action');
+        $result = String::extract('/:controller/:action');
+        
+        $this->assertEquals($expected, $result);
+    }
 }
