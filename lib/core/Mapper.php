@@ -83,16 +83,16 @@ class Mapper {
      *  @return string URL normalizada
      */
     public static function normalize($url) {
-        if(preg_match("/^[a-z]+:/", $url)):
+        if(preg_match('/^[a-z]+:/', $url)):
             return $url;
         endif;
-        $url = "/" . $url;
-        while(strpos($url, "//") !== false):
-            $url = str_replace("//", "/", $url);
+        $url = '/' . $url;
+        while(strpos($url, '//') !== false):
+            $url = str_replace('//', '/', $url);
         endwhile;
-        $url = rtrim($url, "/");
+        $url = rtrim($url, '/');
         if(empty($url)):
-            $url = "/";
+            $url = '/';
         endif;
         return $url;
     }
@@ -156,19 +156,15 @@ class Mapper {
      *
      *  @param string $url URL a ser conectada
      *  @param string $route Rota para a qual a URL será direcionada
-     *  @return true
+     *  @return void
      */
-    public static function connect($url = null, $route = null) {
-        if(is_array($url)):
-            foreach($url as $key => $value):
-                self::connect($key, $value);
-            endforeach;
-        elseif(!is_null($url)):
-            $self = self::getInstance();
-            $url = self::normalize($url);
-            $self->routes[$url] = rtrim($route, "/");
-        endif;
-        return true;
+    public static function connect($url, $defaults, $regex = array()) {
+        $self = self::getInstance();
+        $self->routes []= array(
+            'url' => $url,
+            'defaults' => $defaults,
+            'regex' => $regex
+        );
     }
     /**
      *  Desconecta uma URL de uma rota
@@ -191,13 +187,9 @@ class Mapper {
      */
     public static function match($check, $url = null) {
         if(is_null($url)):
-            $url = Mapper::here();
+            $url = self::here();
         endif;
-        $check_string = String::insert($check, array(
-            'controller' => '([a-z-_]+)',
-            'action' => '([a-z-_]+)'
-        ));
-        $regex = '%^' . $check_string . '$%';
+        $regex = '%^' . $check . '$%';
         
         if(preg_match($regex, $url)):
             return true;
@@ -229,44 +221,19 @@ class Mapper {
      *  @return array URL interpretada
      */
     public static function parse($url = null) {
-        $here = self::normalize(is_null($url) ? self::here() : $url);
-        $url = self::getRoute($here);
-        $prefixes = join("|", self::getPrefixes());
-        
-        $path = array();
-        $parts = array("here", "prefix", "controller", "action", "id", "extension", "params", "queryString");
-        preg_match("/^\/(?:({$prefixes})(?:\/|(?!\w)))?(?:([a-z_-]*)\/?)?(?:([a-z_-]*)\/?)?(?:(\d*))?(?:\.([\w]+))?(?:\/?([^?]+))?(?:\?(.*))?/i", $url, $reg);
-        foreach($parts as $k => $key) {
-            $path[$key] = $reg[$k];
-        }
-        
-        $path["named"] = $path["params"] = array();
-        foreach(explode("/", $reg[6]) as $param):
-            if(preg_match("/([^:]*):([^:]*)/", $param, $reg)):
-                $path["named"][$reg[1]] = urldecode($reg[2]);
-            elseif($param != ""):
-                $path["params"] []= urldecode($param);
+        if(is_null($url)):
+            $url = self::here();
+        endif;
+        $url = self::normalize($url);
+        $self = self::getInstance();
+        foreach($self->routes as $route):
+            $check = String::insert($route['url'], $route['regex']);
+            if(self::match($check, $url)):
+                $parsed = array('controller' => 'home', 'action' => 'index');
+                break;
             endif;
         endforeach;
-
-        $path["here"] = $here;
-        if(empty($path["controller"])) $path["controller"] = self::getRoot();
-        if(empty($path["action"])) $path["action"] = "index";
-        if($filtered = self::filterAction($path["action"])):
-            $path["prefix"] = $filtered["prefix"];
-            $path["action"] = $filtered["action"];
-        endif;
-        if(!empty($path["prefix"])):
-            $path["action"] = "{$path['prefix']}_{$path['action']}";
-        endif;
-        if(empty($path["id"])) $path["id"] = null;
-        if(empty($path["extension"])) $path["extension"] = Config::read("defaultExtension");
-        if(!empty($path["queryString"])):
-            parse_str($path["queryString"], $queryString);
-            $path["named"] = array_merge($path["named"], $queryString);
-        endif;
-        
-        return $path;
+        return $parsed;
     }
     /**
      *  Gera uma URL, levando em consideração o local atual da aplicação.
