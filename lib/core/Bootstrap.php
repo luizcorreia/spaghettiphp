@@ -16,16 +16,10 @@ if(version_compare(PHP_VERSION, '5.2') < 0):
     trigger_error('Spaghetti only works with PHP 5.2 or newer', E_USER_ERROR);
 endif;
 
-/**
-  *  Inclui o arquivo com definições de caminhos.
-  */
 $config_path = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
 require_once $config_path . 'paths.php';
-
-/**
-  *  Inclui algumas classes básicas.
-  */
 require_once 'core/Loader.php';
+
 import('core.Config');
 import('core.debug.Debug');
 

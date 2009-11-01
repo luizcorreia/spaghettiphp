@@ -13,26 +13,33 @@ define('DS', DIRECTORY_SEPARATOR);
   *  Pasta raiz da aplicação.
   */
 define('ROOT', dirname(dirname(__FILE__)));
+
 /**
   *  Pasta contendo os arquivos de sistema.
   */
 define('LIB', ROOT . DS . 'lib');
+
 /**
   *  Pasta contendo o núcleo do Spaghetti*.
   */
 define('CORE', LIB . DS . 'core');
+
 /**
   *  Pasta contendo os arquivos da aplicação.
   */
 define('APP', ROOT . DS . 'app');
+
 /**
   *  Pasta contendo os arquivos de configuração da aplicação.
   */
 define('CONFIG', ROOT . DS . 'config');
+
 /**
-  *  Host em que a aplicação se encontra.
+  *  Define o host em que a aplicação se encontra.
   */
-define('BASE_URL', 'http://' .  $_SERVER['HTTP_HOST']);
+if(isset($_SERVER['HTTP_HOST'])):
+    define('BASE_URL', 'http://' .  $_SERVER['HTTP_HOST']);
+endif;
 
 /**
   *  Inclui os caminhos do Spaghetti* em include_path.
