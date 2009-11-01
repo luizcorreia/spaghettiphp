@@ -3,8 +3,7 @@
  *  Mapper é o responsável por cuidar de URLs e roteamento dentro do Spaghetti*.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- *  @copyright Copyright 2008-2009, Spaghetti* Framework (http://spaghettiphp.org/)
- *
+ *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
 class Mapper {
