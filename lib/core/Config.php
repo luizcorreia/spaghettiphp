@@ -29,7 +29,7 @@ class Config {
      *  @param string $value Valor a ser gravado
      *  @return void
      */
-    public static function write($key = "", $value = "") {
+    public static function write($key, $value) {
         self::$config[$key] = $value;
     }
 }

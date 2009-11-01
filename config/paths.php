@@ -32,7 +32,7 @@ define('CONFIG', ROOT . DS . 'config');
 /**
   *  Host em que a aplicação se encontra.
   */
-define('BASE_URL', 'http://' .  $_SERVER["HTTP_HOST"]);
+define('BASE_URL', 'http://' .  $_SERVER['HTTP_HOST']);
 
 /**
   *  Inclui os caminhos do Spaghetti* em include_path.

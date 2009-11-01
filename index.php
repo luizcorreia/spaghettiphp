@@ -7,4 +7,4 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-require "public/index.php";
+require 'public/index.php';
