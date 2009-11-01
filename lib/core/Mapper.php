@@ -47,12 +47,13 @@ class Mapper {
             $this->here = self::normalize(substr($_SERVER["REQUEST_URI"], $start));
         endif;
     }
-    public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Mapper();
+    public static function getInstance() {
+        static $instance;
+        if($instance === null):
+            $c = __CLASS__;
+            $instance = new $c();
         endif;
-        return $instance[0];
+        return $instance;
     }
     /**
      *  Getter para Mapper::here.
