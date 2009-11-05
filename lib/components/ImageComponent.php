@@ -62,7 +62,7 @@ class ImageComponent {
         
         $input = $input_function($filename);
         $output = imagecreatetruecolor($params['width'], $params['height']);
-        imagecopyresampled($output, $input, 0, 0, 0, 0, $params['width'], $params['height'], $height, $width);
+        imagecopyresampled($output, $input, 0, 0, 0, 0, $params['width'], $params['height'], $width, $height);
 
         // @todo check for PNG quality
         return $output_function($output, $params['filename'], $params['quality'], PNG_ALL_FILTERS);
