@@ -8,7 +8,11 @@
  *
  */
 
-class Dispatcher extends Object {
+import("core.Mapper");
+import("core.controller.Controller");
+import("core.Inflector");
+
+class Dispatcher {
     /**
      *  Chama o controller e a action solicitadas pela URL.
      * 
