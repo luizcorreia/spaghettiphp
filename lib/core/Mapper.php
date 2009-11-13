@@ -8,7 +8,7 @@
 
 import('core.utils.String');
 
-class Mapper {
+class Mapper extends Object {
     /**
      *  Definições de prefixos.
      */

@@ -8,7 +8,7 @@
  *
  */
 
-class Inflector {
+class Inflector extends Object {
     /**
      *  Transforma uma string para o formato camelizado. Ex.: a-casa-amarela => aCasaAmarela
      *  

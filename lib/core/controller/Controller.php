@@ -9,7 +9,7 @@
  *
  */
 
-class Controller {
+class Controller extends Object {
     /**
      *  Define se o layout será renderizado automaticamente.
      */

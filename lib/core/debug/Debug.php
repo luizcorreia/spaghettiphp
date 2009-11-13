@@ -7,7 +7,7 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-class Debug {
+class Debug extends Object {
     /**
       *  Define error_reporting para mostrar erros de acordo com Debug.level.
       *

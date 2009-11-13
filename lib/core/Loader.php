@@ -7,7 +7,7 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-class Loader {
+class Loader extends Object {
     /**
       *  Importa um arquivo.
       *

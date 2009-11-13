@@ -7,7 +7,7 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-class Config {
+class Config extends Object {
     /**
      *  Lista de configurações.
      */

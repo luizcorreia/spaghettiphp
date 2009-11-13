@@ -6,7 +6,7 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-class String {
+class String extends Object {
     public static function insert($string, $data) {
         foreach($data as $key => $value):
             $regex = '%(:' . $key . ')%';

@@ -12,7 +12,7 @@ import("core.Mapper");
 import("core.controller.Controller");
 import("core.Inflector");
 
-class Dispatcher {
+class Dispatcher extends Object {
     /**
      *  Chama o controller e a action solicitadas pela URL.
      * 
