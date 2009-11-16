@@ -29,6 +29,9 @@ class Mapper extends Object {
      *  Controller padrão da aplicação.
      */
     public $root = null;
+    /**
+      *  Short description.
+      */
     public $connectedDefaults = false;
 
     /**

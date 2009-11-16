@@ -18,6 +18,7 @@ endif;
 
 $config_path = dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
 require_once $config_path . 'paths.php';
+require_once 'core/Object.php';
 require_once 'core/Loader.php';
 
 import('core.Config');
