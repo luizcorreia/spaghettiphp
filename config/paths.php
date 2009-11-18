@@ -38,7 +38,8 @@ define('CONFIG', ROOT . DS . 'config');
   *  Define o host em que a aplicação se encontra.
   */
 if(isset($_SERVER['HTTP_HOST'])):
-    define("BASE_URL", "http" . ($_SERVER["HTTPS"] == "on" ? "s" : "") . "://" . $_SERVER["HTTP_HOST"]);
+    $https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
+    define('BASE_URL', 'http' . ($https ? 's' : '') . '://' . $_SERVER['HTTP_HOST']);
 endif;
 
 /**
