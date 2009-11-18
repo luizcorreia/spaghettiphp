@@ -71,6 +71,7 @@ class Mapper extends Object {
             'action' => '([a-z-_]+)'
         );
         Mapper::connect('/', $defaults, $regex);
+        Mapper::connect('/:controller', $defaults, $regex);
         Mapper::connect('/:controller/:action', $defaults, $regex);
         $this->connectedDefaults = true;
     }

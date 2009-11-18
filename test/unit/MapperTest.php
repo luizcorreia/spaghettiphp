@@ -13,21 +13,30 @@ class MapperTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($result);
     }
-    public function testParse() {
-        $expected = array(
-            'controller' => 'controller',
-            'action' => 'action'
-        );
-        $result = Mapper::parse('/controller/action');
-        
-        $this->assertEquals($expected, $result);
-    }
     public function testParseDefaults() {
         $expected = array(
             'controller' => 'home',
             'action' => 'index'
         );
         $result = Mapper::parse('/');
+        
+        $this->assertEquals($expected, $result);
+    }
+    public function testParseWithController() {
+        $expected = array(
+            'controller' => 'home',
+            'action' => 'index'
+        );
+        $result = Mapper::parse('/home');
+        
+        $this->assertEquals($expected, $result);
+    }
+    public function testParse() {
+        $expected = array(
+            'controller' => 'controller',
+            'action' => 'action'
+        );
+        $result = Mapper::parse('/controller/action');
         
         $this->assertEquals($expected, $result);
     }
