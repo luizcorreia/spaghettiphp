@@ -1,13 +1,25 @@
 <?php
 /**
- *  Short description.
+ *  Spaghetti* Framework.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
+/**
+  *  Bem vindo ao Spaghetti*! Esse é o front controller que receberá todas as
+  *  requisições feitas à sua aplicação, e estas serão enviadas para Dispatcher
+  *  para serem processadas e enviarem a resposta ao usuário.
+  */
+
+/**
+  *  O arquivo incluído abaixo é o responsável pela configuração e inicialização
+  *  do Spaghetti*.
+  */
 require_once dirname(dirname(__FILE__)) . '/config/bootstrap.php';
 
+/**
+  *  Importa Dispatcher e dispara uma requisição.
+  */
 import('core.Dispatcher');
-
 Dispatcher::dispatch();

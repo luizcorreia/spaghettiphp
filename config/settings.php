@@ -1,13 +1,14 @@
 <?php
 /**
- *  Esse é o arquivo das principais configurações do Spaghetti*. Através delas,
+ *  settings.php é o arquivo das principais configurações do Spaghetti*. Através delas,
  *  você pode configurar o comportamento da sua aplicação.
  */
 
 /**
   *  App.environment define o ambiente em que sua aplicação se encontra. Geralmente
-  *  existem os environments development (para desenvolvimento), production (para
-  *  produção) e test (para testes automatizados).
+  *  existem os environments 'development' (para desenvolvimento), 'production'
+  *  (para produção) e 'test' (para testes automatizados). Entretanto, você pode
+  *  criar quantos environments você desejar.
   */
 Config::write('App.environment', 'development');
 
@@ -22,7 +23,6 @@ Config::write('App.defaultExtension', 'htm');
   */
 Config::write('App.encoding', 'utf-8');
 
-
 /**
   *  Security.salt é uma string qualquer que precede dados criptografados, tornando
   *  menos improvável a quebra de hashes usando rainbow tables.
@@ -30,6 +30,12 @@ Config::write('App.encoding', 'utf-8');
 Config::write('Security.salt', 'e6628645a7');
 
 /**
-  *  Short description.
+  *  Inclui as configurações específicas do ambiente definido em App.environment.
   */
 import('config.environments.' . Config::read('App.environment'));
+
+/**
+  *  Define a configuração error_reporting do PHP de acordo com Debug.level, definida
+  *  no environment atual usado pela aplicação.
+  */
+Debug::errorReporting(Config::read('Debug.level'));

@@ -14,10 +14,7 @@ class Debug extends Object {
       *  @param integer $level Nível de erros a serem mostrados
       *  @return void
       */
-    public static function errorReporting($level = null) {
-        if(is_null($level)):
-            $level = Config::read("Debug.level");
-        endif;
+    public static function errorReporting($level) {
         switch($level):
             case 3:
                 $level = E_ALL | E_STRICT;
@@ -31,7 +28,7 @@ class Debug extends Object {
             default:
                 $level = 0;
         endswitch;
-        ini_set("error_reporting", $level);
+        ini_set('error_reporting', $level);
     }
     /**
       *  Formata e imprime o conteúdo de uma variável.
@@ -40,7 +37,7 @@ class Debug extends Object {
       *  @return void
       */
     public static function pr($data) {
-        echo "<pre>" . print_r($data, true) . "</pre>";
+        echo '<pre>' . print_r($data, true) . '</pre>';
     }
     /**
       *  Formata e imprime o conteúdo parseável de uma variável.

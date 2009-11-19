@@ -1,7 +1,6 @@
 <?php
 /**
- *  Config é a classe que toma conta de todas as configurações necessárias para
- *  uma aplicação do Spaghetti*.
+ *  Config é a classe que toma conta da leitura e escrita de configurações do Spaghetti*.
  *
  *  @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
@@ -11,7 +10,7 @@ class Config extends Object {
     /**
      *  Lista de configurações.
      */
-    private static $config = array();
+    protected static $config = array();
 
     /**
      *  Retorna o valor de uma chave de configuração.
