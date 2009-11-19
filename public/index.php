@@ -6,9 +6,8 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-require_once '../lib/core/Bootstrap.php';
+require_once dirname(dirname(__FILE__)) . '/config/bootstrap.php';
 
 import('core.Dispatcher');
 
-$dispatcher = new Dispatcher;
-$dispatcher->dispatch();
+Dispatcher::dispatch();

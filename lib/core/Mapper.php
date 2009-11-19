@@ -43,7 +43,7 @@ class Mapper extends Object {
             while(in_array(basename($this->base), array("app", "webroot"))):
                 $this->base = dirname($this->base);
             endwhile;
-            if($this->base == DS || $this->base == "."):
+            if($this->base == DIRECTORY_SEPARATOR || $this->base == "."):
                 $this->base = "/";
             endif;
         endif;

@@ -16,7 +16,7 @@ class Loader extends Object {
       *  @return boolean Retorno da importação do arquivo
       */
     public static function import($file, $extension = 'php') {
-        $file = str_replace('.', DS, $file);
+        $file = str_replace('.', '/', $file);
         return require_once $file . '.' . $extension;
     }
 }
