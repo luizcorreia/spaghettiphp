@@ -28,8 +28,3 @@ import('core.debug.Debug');
   */
 import('config.settings');
 import('config.routes');
-
-/**
-  *  Habilita error_reporting de acordo com Debug.level.
-  */
-Debug::errorReporting();

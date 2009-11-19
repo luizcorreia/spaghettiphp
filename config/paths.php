@@ -21,9 +21,9 @@ define('SPAGHETTI_APP', ROOT . '/app');
   *  Inclui os caminhos do Spaghetti* em include_path.
   */
 $path = array();
-$path []= APP;
-$path []= ROOT . '/lib';
-$path []= ROOT;
+$path []= SPAGHETTI_APP;
+$path []= SPAGHETTI_ROOT . '/lib';
+$path []= SPAGHETTI_ROOT;
 $path []= get_include_path();
 $path = implode(PATH_SEPARATOR, $path);
 set_include_path($path);

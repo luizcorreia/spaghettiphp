@@ -33,3 +33,8 @@ Config::write('Debug.level', 3);
   *  menos improvável a quebra de hashes usando rainbow tables.
   */
 Config::write('Security.salt', 'e6628645a7');
+
+/**
+  *  Short description.
+  */
+import('config.environments.' . Config::read('App.environment'));
