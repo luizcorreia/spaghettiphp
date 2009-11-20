@@ -9,6 +9,6 @@
 class Log extends Object {
     public static function write($message, $type = 'error') {
         $data = $type . '=' . $message;
-        file_put_contents(SPAGHETTI_ROOT . '/log/error', $data);
+        file_put_contents(SPAGHETTI_ROOT . '/tmp/log/error', $data);
     }
 }

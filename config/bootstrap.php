@@ -30,6 +30,7 @@ require_once 'core/Object.php';
 require_once 'core/Loader.php';
 import('core.Config');
 import('core.debug.Debug');
+import('core.debug.Log');
 import('core.Mapper');
 
 /**

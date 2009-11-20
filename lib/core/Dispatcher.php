@@ -19,6 +19,7 @@ class Dispatcher extends Object {
      *  @return mixed Instância do novo controller ou falso em caso de erro
      */ 
     public static function dispatch() {
+        Log::write('test');
         $path = Mapper::parse();
         $path["controller"] = Inflector::hyphenToUnderscore($path["controller"]);
         $path["action"] = Inflector::hyphenToUnderscore($path["action"]);
