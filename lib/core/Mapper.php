@@ -10,10 +10,6 @@ import('core.utils.String');
 
 class Mapper extends Object {
     /**
-     *  Definições de prefixos.
-     */
-    public $prefixes = array();
-    /**
      *  Definição de rotas.
      */
     public $routes = array();
