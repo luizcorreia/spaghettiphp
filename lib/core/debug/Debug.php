@@ -48,6 +48,12 @@ class Debug extends Object {
     public static function dump($data) {
         self::pr(var_export($data, true));
     }
+    /**
+      *  Short description.
+      */
+    public static function trace() {
+        return debug_backtrace();
+    }
 }
 
 /**
