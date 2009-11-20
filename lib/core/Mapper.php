@@ -25,10 +25,6 @@ class Mapper extends Object {
      *  URL base da aplicação.
      */
     private $base = null;
-    /**
-     *  Controller padrão da aplicação.
-     */
-    public $root = null;
 
     /**
      *  Define a URL base e URL atual da aplicação.
@@ -97,26 +93,6 @@ class Mapper extends Object {
         return $url;
     }
     /**
-     *  Define o controller padrão da aplicação.
-     *
-     *  @param string $controller Controller a ser definido como padrão
-     *  @return true
-     */
-    public static function root($controller) {
-        $self = self::getInstance();
-        $self->root = $controller;
-        return true;
-    }
-    /**
-     *  Getter para Mapper::root
-     *
-     *  @return string Controller padrão da aplicação
-     */
-    public static function getRoot() {
-        $self = self::getInstance();
-        return $self->root;
-    }
-    /**
      *  Habilita um prefixo.
      *
      *  @param string $prefix Prefixo a ser habilitado
@@ -158,7 +134,7 @@ class Mapper extends Object {
      *  @param string $route Rota para a qual a URL será direcionada
      *  @return void
      */
-    public static function connect($url, $defaults, $regex = array()) {
+    public static function connect($url, $defaults = array(), $regex = array()) {
         $self = self::getInstance();
         $self->routes []= array(
             'url' => $url,
