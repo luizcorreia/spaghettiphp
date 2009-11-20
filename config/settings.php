@@ -30,6 +30,14 @@ Config::write('App.encoding', 'utf-8');
 Config::write('Security.salt', 'e6628645a7');
 
 /**
+  *  Define se o Spaghetti* está funcionando com o módulo de reescrita de URL ativado.
+  *  Caso seu servidor não tenha o recurso de reescrita de URL, defina a configuração
+  *  abaixo para false, e sua aplicação estará disponível através de URLs como
+  *  /index.php/controller/action/id
+  */
+Config::write('App.rewriteUrl', true);
+
+/**
   *  Inclui as configurações específicas do ambiente definido em App.environment.
   */
 import('config.environments.' . Config::read('App.environment'));

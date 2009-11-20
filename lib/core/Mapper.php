@@ -12,25 +12,26 @@ class Mapper extends Object {
     /**
      *  Definição de rotas.
      */
-    public $routes = array();
+    protected $routes = array();
     /**
      *  URL atual da aplicação.
      */
-    private $here = null;
+    protected $here = null;
     /**
      *  URL base da aplicação.
      */
-    private $base = null;
+    protected $base = null;
 
     /**
      *  Define a URL base e URL atual da aplicação.
      */
     public function __construct() {
         if(is_null($this->base)):
-            $this->base = dirname($_SERVER["PHP_SELF"]);
-            while(in_array(basename($this->base), array("app", "webroot"))):
-                $this->base = dirname($this->base);
-            endwhile;
+            if(Config::read('App.rewriteUrl')):
+                $this->base = dirname($_SERVER["PHP_SELF"]);
+            else:
+                $this->base = $_SERVER["SCRIPT_NAME"];
+            endif;
             if($this->base == DIRECTORY_SEPARATOR || $this->base == "."):
                 $this->base = "/";
             endif;
