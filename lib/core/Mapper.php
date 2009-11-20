@@ -29,10 +29,6 @@ class Mapper extends Object {
      *  Controller padrão da aplicação.
      */
     public $root = null;
-    /**
-      *  Short description.
-      */
-    public $connectedDefaults = false;
 
     /**
      *  Define a URL base e URL atual da aplicação.
@@ -60,24 +56,6 @@ class Mapper extends Object {
         endif;
         
         return $instance;
-    }
-    public function connectDefaults() {
-        $defaults = array(
-            'controller' => 'home',
-            'action' => 'index'
-        );
-        $regex = array(
-            'controller' => '([a-z-_]+)',
-            'action' => '([a-z-_]+)',
-            'id' => '([0-9]+)'
-        );
-        Mapper::connect('/', $defaults, $regex);
-        Mapper::connect('/:controller', $defaults, $regex);
-        Mapper::connect('/:controller/:id', $defaults, $regex);
-        Mapper::connect('/:controller/:action', $defaults, $regex);
-        Mapper::connect('/:controller/:action/:id', $defaults, $regex);
-        # Mapper::connect('/:controller/:action/:id/*', $defaults, $regex);
-        $this->connectedDefaults = true;
     }
     /**
      *  Getter para Mapper::here.
@@ -240,9 +218,6 @@ class Mapper extends Object {
      */
     public static function parse($url = null) {
         $self = self::getInstance();
-        if(!$self->connectedDefaults):
-            $self->connectDefaults();
-        endif;
         if(is_null($url)):
             $url = self::here();
         endif;
