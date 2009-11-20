@@ -50,6 +50,8 @@ class Debug extends Object {
     }
     /**
       *  Short description.
+      *
+      *  @return string
       */
     public static function trace() {
         return debug_backtrace();
