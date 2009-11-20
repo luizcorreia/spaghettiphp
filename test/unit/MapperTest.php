@@ -4,7 +4,7 @@ require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 import('core.Mapper');
 
 class MapperTest extends PHPUnit_Framework_TestCase {
-    public function testMatch() {
+    public function testMatchUrlWithRoute() {
         $check = String::insert('/:controller/:action', array(
             'controller' => '([a-z-_]+)',
             'action' => '([a-z-_]+)'
@@ -13,7 +13,7 @@ class MapperTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($result);
     }
-    public function testParseDefaults() {
+    public function testParseRootUrl() {
         $expected = array(
             'controller' => 'home',
             'action' => 'index'
@@ -22,7 +22,7 @@ class MapperTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals($expected, $result);
     }
-    public function testParseWithController() {
+    public function testParseOnlyController() {
         $expected = array(
             'controller' => 'home',
             'action' => 'index'
@@ -31,12 +31,32 @@ class MapperTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals($expected, $result);
     }
-    public function testParse() {
+    public function testParseControllerAndAction() {
         $expected = array(
             'controller' => 'controller',
             'action' => 'action'
         );
         $result = Mapper::parse('/controller/action');
+        
+        $this->assertEquals($expected, $result);
+    }
+    public function testParseControllerAndActionAndId() {
+        $expected = array(
+            'controller' => 'controller',
+            'action' => 'action',
+            'id' => 1
+        );
+        $result = Mapper::parse('/controller/action/1');
+        
+        $this->assertEquals($expected, $result);
+    }
+    public function testParseControllerAndId() {
+        $expected = array(
+            'controller' => 'controller',
+            'action' => 'index',
+            'id' => 1
+        );
+        $result = Mapper::parse('/controller/1');
         
         $this->assertEquals($expected, $result);
     }
