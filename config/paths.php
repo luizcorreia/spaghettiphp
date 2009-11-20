@@ -15,7 +15,7 @@ define('SPAGHETTI_ROOT', dirname(dirname(__FILE__)));
 /**
   *  Esse é o caminho onde estão todos os arquivos de sua aplicação.
   */
-define('SPAGHETTI_APP', ROOT . '/app');
+define('SPAGHETTI_APP', SPAGHETTI_ROOT . '/app');
 
 /**
   *  Inclui os caminhos do Spaghetti* em include_path. Caso você tenha instalado
