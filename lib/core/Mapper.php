@@ -89,41 +89,6 @@ class Mapper extends Object {
         return $url;
     }
     /**
-     *  Habilita um prefixo.
-     *
-     *  @param string $prefix Prefixo a ser habilitado
-     *  @return true
-     */
-    public static function prefix($prefix) {
-        $self = self::getInstance();
-        if(is_array($prefix)) $prefixes = $prefix;
-        else $prefixes = func_get_args();
-        foreach($prefixes as $prefix):
-            $self->prefixes []= $prefix;
-        endforeach;
-        return true;
-    }
-    /**
-     *  Remove um prefixo da lista.
-     *
-     *  @param string $prefix Prefixo a ser removido
-     *  @return true
-     */
-    public static function unsetPrefix($prefix) {
-        $self = self::getInstance();
-        unset($self->prefixes[$prefix]);
-        return true;
-    }
-    /**
-     *  Retorna uma lista com todos os prefixos definidos pela aplicação.
-     *
-     *  @return array Lista de prefixos
-     */
-    public static function getPrefixes() {
-        $self = self::getInstance();
-        return $self->prefixes;
-    }
-    /**
      *  Conecta uma URL a uma rota do Spaghetti.
      *
      *  @param string $url URL a ser conectada
@@ -164,23 +129,6 @@ class Mapper extends Object {
         $regex = '%^' . $check . '$%';
         
         return preg_match($regex, $url, $results) ? true : false;
-    }
-    /**
-     *  Retorna a rota correspondente a uma URL.
-     *
-     *  @param string $url URL a ser convertida para uma rota
-     *  @return string Rota para a URL provida
-     */
-    public static function getRoute($url) {
-        $self = self::getInstance();
-        foreach($self->routes as $map => $route):
-            if(self::match($map, $url)):
-                $map = "%^" . str_replace(array(":any", ":fragment", ":num"), array("(.+)", "([^\/]+)", "([0-9]+)"), $map) . "/?$%";
-                $url = preg_replace($map, $route, $url);
-                break;
-            endif;
-        endforeach;
-        return self::normalize($url);
     }
     /**
      *  Faz a interpretação da URL, identificando as partes da URL.
