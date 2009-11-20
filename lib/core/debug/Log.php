@@ -8,7 +8,11 @@
 
 class Log extends Object {
     public static function write($message, $type = 'error') {
-        $data = $type . '=' . $message;
-        file_put_contents(SPAGHETTI_ROOT . '/tmp/log/error', $data);
+        $data = sprintf('[%s] [%s] %s' . PHP_EOL, date('Y-m-d H:i:s'), $type, $message);
+
+        // replace with File class or something like that
+        $file = fopen(SPAGHETTI_ROOT . '/tmp/log/error', 'a');
+        fwrite($file, $data);
+        fclose($file);
     }
 }
