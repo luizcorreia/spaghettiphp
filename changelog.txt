@@ -1,3 +1,13 @@
+version 0.3 (2010-?)
+    * Created new folder structure
+    * Removed class App
+    * Added class Loader, for file loading, replacing App
+    * Reworked file loading method
+    * Reworked Mapper's routing and parsing
+    * Added class Debug and moved pr() and dump() to it (aliases still exist)
+    * Reworked ImageComponent
+    * Introduced new coding patterns
+
 version 0.2 (2009-12-01)
     * HtmlHelper::image() now has default alt and title attributes
     * Added HtmlHelper::imagelink()

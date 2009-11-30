@@ -8,13 +8,17 @@
  *
  */
 
+import("core.Mapper");
+import("core.controller.Controller");
+import("core.Inflector");
+
 class Dispatcher extends Object {
     /**
      *  Chama o controller e a action solicitadas pela URL.
      * 
      *  @return mixed Instância do novo controller ou falso em caso de erro
      */ 
-    public function dispatch() {
+    public static function dispatch() {
         $path = Mapper::parse();
         $path["controller"] = Inflector::hyphenToUnderscore($path["controller"]);
         $path["action"] = Inflector::hyphenToUnderscore($path["action"]);
