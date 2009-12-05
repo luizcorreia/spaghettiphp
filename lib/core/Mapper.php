@@ -132,31 +132,41 @@ class Mapper extends Object {
         return preg_match($regex, $url, $results) ? true : false;
     }
     /**
+      *  Short description.
+      *
+      *  @return array
+      */
+    public static function getRoute($url) {
+        $self = self::getInstance();
+        foreach($self->routes as $route):
+            $check = String::insert($route['url'], $route['regex']);
+            if(self::match($check, $url, $result)):
+                array_shift($result);
+                $route['result'] = $result;
+
+                return $route;
+            endif;
+        endforeach;
+    }
+    /**
      *  Faz a interpretação da URL, identificando as partes da URL.
      * 
      *  @param string $url URL a ser interpretada
      *  @return array URL interpretada
      */
     public static function parse($url = null) {
-        $self = self::getInstance();
         if(is_null($url)):
             $url = self::here();
         endif;
-        $url = self::normalize($url);
-        foreach($self->routes as $route):
-            $check = String::insert($route['url'], $route['regex']);
-            if(self::match($check, $url, $result)):
-                array_shift($result);
-                $parsed = array();
-                $extracted = String::extract($route['url']);
-                foreach($extracted as $key => $name):
-                    $parsed[$name] = $result[$key];
-                endforeach;
-                $parsed += $route['defaults'];
-                
-                return $parsed;
-            endif;
+        $route = self::getRoute(self::normalize($url));
+        $parsed = array();
+        $extracted = String::extract($route['url']);
+        foreach($extracted as $key => $name):
+            $parsed[$name] = $route['result'][$key];
         endforeach;
+        $parsed += $route['defaults'];
+        
+        return $parsed;
     }
     /**
      *  Gera uma URL, levando em consideração o local atual da aplicação.
