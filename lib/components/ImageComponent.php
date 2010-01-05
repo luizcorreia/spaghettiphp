@@ -145,8 +145,20 @@ class ImageComponent extends Component {
         );
         imagedestroy($input);
 
-        // @todo check for PNG quality
-        $output_image = $output_function($output, $destiny['filename'], $destiny['quality'], PNG_ALL_FILTERS);
+        switch($output_type):
+            case 'jpeg':
+                $output_image = imagejpeg($output, $destiny['filename'], $destiny['quality']);
+                break;
+            case 'gif':
+                $output_image = imagegif($output, $destiny['filename']);
+                break;
+            case 'png':
+                if($destiny['quality'] > 9):
+                    $destiny['quality'] = 10 - floor($destiny['quality'] / 10);
+                endif;
+                $output_image = imagepng($output, $destiny['filename'], $destiny['quality'], PNG_ALL_FILTERS);
+                break;
+        endswitch;
         imagedestroy($output);
         
         return $output_image;
