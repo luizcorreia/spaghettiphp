@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'bootstrap.php';
-import('core.Inflector');
+import('core.common.Inflector');
 import('core.model.Model');
 
 class ModelTest extends PHPUnit_Framework_TestCase {

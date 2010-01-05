@@ -26,11 +26,12 @@ require_once dirname(__FILE__) . '/paths.php';
 /**
   *  Inclui classes básicas para o funcionamento do Spaghetti*.
   */
-require_once 'core/Object.php';
-require_once 'core/Loader.php';
-import('core.Config');
+require_once 'core/common/Object.php';
+require_once 'core/common/Loader.php';
+import('core.common.Config');
 import('core.debug.Debug');
 import('core.debug.Log');
+// @todo move core.Mapper to core.mapper.Mapper
 import('core.Mapper');
 
 /**
