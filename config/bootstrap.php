@@ -29,6 +29,7 @@ require_once dirname(__FILE__) . '/paths.php';
 require_once 'core/common/Object.php';
 require_once 'core/common/Loader.php';
 import('core.common.Config');
+import('core.common.String');
 import('core.debug.Debug');
 import('core.debug.Log');
 // @todo move core.Mapper to core.mapper.Mapper

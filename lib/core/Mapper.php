@@ -6,8 +6,6 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
-import('core.utils.String');
-
 class Mapper extends Object {
     /**
      *  Definição de rotas.
