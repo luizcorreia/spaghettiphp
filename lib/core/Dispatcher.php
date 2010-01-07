@@ -10,7 +10,7 @@
 
 import("core.Mapper");
 import("core.controller.Controller");
-import("core.Inflector");
+import("core.common.Inflector");
 
 class Dispatcher extends Object {
     /**
