@@ -11,10 +11,16 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     public function tearDown() {
         $this->User = null;
     }
-    public function testBaseInstanceShouldNotBeEditable() {
-        $user = new User(false, false, true);
-        
-        $this->assertFalse($user->newRecord);
+    public function testMainInstanceShouldNotBeNewRecord() {
+        $this->assertFalse($this->User->isNewRecord());
+    }
+    public function testMainInstanceShouldNotBeEditable() {
+        $this->setExpectedException('BadMethodCallException');
+        $this->User->name = 'spaghettiphp';
+    }
+    public function testMainInstanceShouldNotBeReadable() {
+        $this->setExpectedException('Exception');
+        $name = $this->User->name;
     }
     public function testShouldSetAndGetFieldForSingleRecord() {
         $user = $this->User->create();
@@ -90,10 +96,15 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(md5('spaghettiphp'), $user->password);
         $this->assertFalse($user->admin);
     }
+    public function testShouldNotOverwriteRecordWithCreate() {
+        $this->setExpectedException('BadMethodCallException');
+        $user = $this->User->create();
+        $user->create();
+    }
     public function testShouldCreateANewEmptyRecord() {
         $user = $this->User->create();
         
-        $this->assertTrue($user->newRecord);
+        $this->assertTrue($user->isNewRecord());
     }
     public function testShouldCreateANewRecordWithAttributes() {
         $user = $this->User->create(array(
@@ -103,7 +114,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals('spaghettiphp', $user->name);
         $this->assertEquals(md5('spaghettiphp'), $user->password);
-        $this->assertTrue($user->newRecord);
+        $this->assertTrue($user->isNewRecord());
     }
     public function testShouldCreateANewRecordWithClosure() {
         if(version_compare(PHP_VERSION, '5.3') < 0):
@@ -116,7 +127,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals('spaghettiphp', $user->name);
         $this->assertEquals(md5('spaghettiphp'), $user->password);
-        $this->assertTrue($user->newRecord);
+        $this->assertTrue($user->isNewRecord());
     }
     public function testShouldCreateANewRecordWithNew() {
         $user = new User(array(
@@ -126,7 +137,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals('spaghettiphp', $user->name);
         $this->assertEquals(md5('spaghettiphp'), $user->password);
-        $this->assertTrue($user->newRecord);
+        $this->assertTrue($user->isNewRecord());
     }
     public function testShouldReturnAConnectionAccordingToDatabaseConfig() {
         // @todo refactor

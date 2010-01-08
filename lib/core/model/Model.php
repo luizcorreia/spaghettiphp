@@ -33,7 +33,7 @@ class Model extends Object {
     /**
       *  Short description.
       */
-    public $newRecord = false;
+    protected $newRecord = false;
     /**
       *  Short description.
       */
@@ -47,6 +47,8 @@ class Model extends Object {
       *  Short description.
       *
       *  @param mixed $record
+      *  @param boolean $new_record
+      *  @param boolean $mainInstance
       *  @return object $this
       */
     public function __construct($record = null, $new_record = true, $main_instance = false) {
@@ -71,6 +73,7 @@ class Model extends Object {
       *  @return mixed
       */
     public function __get($name) {
+        $this->protectMainInstance();
         $name = $this->alias($name);
         if(in_array($name, $this->getters)):
             $getter = 'get' . Inflector::camelize($name);
@@ -89,6 +92,7 @@ class Model extends Object {
       *  @return mixed
       */
     public function __set($name, $value) {
+        $this->protectMainInstance();
         $name = $this->alias($name);
         if(in_array($name, $this->setters)):
             $setter = 'set' . Inflector::camelize($name);
@@ -140,12 +144,7 @@ class Model extends Object {
       *  @return object
       */
     public function &connection($environment = null) {
-        static $instance;
-        if($instance === null):
-            $instance = Connection::datasource($environment);
-        endif;
-        
-        return $instance;
+        return Connection::datasource($environment);
     }
     /**
       *  Short description.
@@ -154,6 +153,7 @@ class Model extends Object {
       *  @return object
       */
     public function create($record = null) {
+        $this->protectRecord();
         $class = get_class($this);
         return new $class($record, true);
     }
@@ -165,6 +165,36 @@ class Model extends Object {
       */
     public function get($name) {
         return $this->attributes[$name];
+    }
+    /**
+      *  Short description.
+      *
+      *  @return boolean
+      */
+    public function isNewRecord() {
+        return $this->newRecord;
+    }
+    /**
+      *  Short description.
+      *
+      *  @throws BadMethodCallException
+      *  @return void
+      */
+    protected function protectMainInstance() {
+        if($this->mainInstance):
+            throw new BadMethodCallException;
+        endif;
+    }
+    /**
+      *  Short description.
+      *
+      *  @throws BadMethodCallException
+      *  @return void
+      */
+    protected function protectRecord() {
+        if(!$this->mainInstance):
+            throw new BadMethodCallException;
+        endif;
     }
     /**
       *  Short description.
