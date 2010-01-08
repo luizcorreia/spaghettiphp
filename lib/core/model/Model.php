@@ -49,13 +49,13 @@ class Model extends Object {
       */
     public function __construct($record = null, $new_record = true) {
         $this->newRecord = $new_record;
-        
+
         if(is_callable($record)):
             // callbacks are available in PHP 5.3+ only
             $self =& $this;
             $record($self);
         elseif(is_array($record)):
-            $this->attributes($record);
+            $this->attributes($record, $this->newRecord);
         endif;
 
         return $this;
@@ -113,14 +113,18 @@ class Model extends Object {
       *  @param array $attributes
       *  @return object $this
       */
-    public function attributes(array $attributes) {
+    public function attributes(array $attributes, $protect = true) {
         $blacklist = !empty($this->blacklist);
         $whitelist = !empty($this->whitelist);
         foreach($attributes as $name => $value):
-            $protected = (
-                $blacklist && in_array($name, $this->blacklist) or
-                $whitelist && !in_array($name, $this->whitelist)
-            );
+            if($protect):
+                $protected = (
+                    $blacklist && in_array($name, $this->blacklist) or
+                    $whitelist && !in_array($name, $this->whitelist)
+                );
+            else:
+                $protected = false;
+            endif;
             if(!$protected):
                 $this->{$name} = $value;
             endif;

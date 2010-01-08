@@ -50,7 +50,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $user->myName = $expected = 'spaghettiphp';
         $this->assertEquals($expected, $user->name);
     }
-    public function testShouldSetMultipleAttributesWithSet() {
+    public function testShouldSetMultipleAttributesWithMassSetting() {
         $user = $this->User->create();
         $user->attributes(array(
             'name' => 'spaghetti',
@@ -62,7 +62,6 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     }
     public function testShouldNotSetProtectedAttributesWithMassSetting() {
         $user = $this->User->create();
-        $user->blacklist = array('admin');
         $user->admin = false;
         $user->attributes(array(
             'name' => 'spaghettiphp',
@@ -126,6 +125,14 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(md5('spaghettiphp'), $user->password);
         $this->assertTrue($user->isNewRecord());
     }
+    public function testShouldCreateAnExistingRecordAndBypassProtection() {
+        $user = new User(array(
+            'admin' => true
+        ), false);
+        
+        $this->assertTrue($user->admin);
+        $this->assertTrue($user->admin);
+    }
     public function testShouldReturnAConnectionAccordingToDatabaseConfig() {
         $result = $this->User->connection('test');
         $database = Config::read('database');
@@ -142,6 +149,7 @@ class User extends Model {
     );
     public $getters = array('username');
     public $setters = array('password');
+    public $blacklist = array('admin');
     
     public function getUsername() {
         return $this->name;
