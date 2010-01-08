@@ -20,8 +20,6 @@ require_once dirname(dirname(__FILE__)) . '/config/bootstrap.php';
 
 /**
   *  Importa Dispatcher e dispara uma requisição.
-  *
-  *  @todo move core.Dispatcher to core.dispatcher.Dispatcher
   */
-import('core.Dispatcher');
+import('core.dispatcher.Dispatcher');
 Dispatcher::dispatch();

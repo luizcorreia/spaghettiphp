@@ -32,8 +32,7 @@ import('core.common.Config');
 import('core.common.String');
 import('core.debug.Debug');
 import('core.debug.Log');
-// @todo move core.Mapper to core.mapper.Mapper
-import('core.Mapper');
+import('core.dispatcher.Mapper');
 
 /**
   *  Inclui os arquivos de configuração da aplicação.

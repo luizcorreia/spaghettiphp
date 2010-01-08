@@ -8,7 +8,7 @@
  *
  */
 
-import("core.Mapper");
+import("core.dispatcher.Mapper");
 import("core.controller.Controller");
 import("core.common.Inflector");
 

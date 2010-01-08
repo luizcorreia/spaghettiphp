@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'bootstrap.php';
-import('core.Mapper');
+import('core.dispatcher.Mapper');
 
 class MapperTest extends PHPUnit_Framework_TestCase {
     public function testMatchUrlWithRoute() {
