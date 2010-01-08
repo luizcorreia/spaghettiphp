@@ -127,9 +127,11 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($user->isNewRecord());
     }
     public function testShouldReturnAConnectionAccordingToDatabaseConfig() {
-        // @todo refactor
-        $expected = $this->User->connection('test');
-        $this->assertType('MysqlDatasource', $expected);
+        $result = $this->User->connection('test');
+        $database = Config::read('database');
+        $type = Inflector::camelize($database['test']['driver']) . 'Datasource';
+        
+        $this->assertType($type, $result);
     }
 }
 
