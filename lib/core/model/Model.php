@@ -135,6 +135,7 @@ class Model extends Object {
       *  Short description.
       *
       *  @todo test
+      *  @todo protected
       *  @param string $environment
       *  @return object
       */
@@ -175,4 +176,18 @@ class Model extends Object {
     public function set($name, $value) {
         return $this->attributes[$name] = $value;
     }
+    
+    
+    /**
+      *  Not yet implemented functions.
+      */
+    public function all() {}
+    public function delete() {}
+    public function exists() {}
+    public function first() {}
+    public function insert() {}
+    public function last() {}
+    public function save() {}
+    public function toList() {}
+    public function update() {}
 }
