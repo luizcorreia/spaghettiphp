@@ -128,6 +128,10 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(md5('spaghettiphp'), $user->password);
         $this->assertTrue($user->newRecord);
     }
+    public function testShouldReturnAConnectionAccordingToDatabaseConfig() {
+        $expected = $this->User->connection('test');
+        $this->assertType('MysqlDatasource', $expected);
+    }
 }
 
 class User extends Model {

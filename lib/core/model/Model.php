@@ -6,6 +6,7 @@
  *  @copyright Copyright 2008-2010, Spaghetti* Framework (http://spaghettiphp.org/)
  */
 
+import('core.model.Connection');
 import('core.model.Exceptions');
 
 class Model extends Object {
@@ -133,6 +134,23 @@ class Model extends Object {
     /**
       *  Short description.
       *
+      *  @todo test
+      *  @param string $environment
+      *  @return object
+      */
+    public function &connection($environment = null) {
+        static $instance;
+        if($instance === null):
+            $c = __CLASS__;
+            $instance = Connection::datasource($environment);
+        endif;
+        
+        return $instance;
+    }
+    /**
+      *  Short description.
+      *
+      *  @param mixed $record
       *  @return object
       */
     public function create($record = null) {

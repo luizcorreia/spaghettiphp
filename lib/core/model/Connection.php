@@ -17,18 +17,21 @@ class Connection extends Object {
      *  Datasources já instanciados.
      */
     private $datasources = array();
+    
     /**
      *  Lendo arquivos de configuração do banco de dados.
      */
     public function __construct() {
         $this->config = Config::read("database");
     }
-    public static function &getInstance() {
-        static $instance = array();
-        if(!isset($instance[0]) || !$instance[0]):
-            $instance[0] = new Connection;
+    public static function &instance() {
+        static $instance;
+        if($instance === null):
+            $c = __CLASS__;
+            $instance = new $c();
         endif;
-        return $instance[0];
+        
+        return $instance;
     }
     /**
      *  Cria uma instância de um datasource ou retorna outra instância existente.
@@ -36,24 +39,25 @@ class Connection extends Object {
      *  @param string $environment Configuração de ambiente a ser usada
      *  @return object Instância do datasource
      */
-    public static function &getDatasource($environment = null) {
-        $self = self::getInstance();
-        $environment = is_null($environment) ? Config::read("environment") : $environment;
+    public static function &datasource($environment = null) {
+        $self = self::instance();
+        $environment = is_null($environment) ? Config::read('App.environment') : $environment;
+        
         if(isset($self->config[$environment])):
             $config = $self->config[$environment];
         else:
-            trigger_error("Can't find database configuration. Check /app/config/database.php", E_USER_ERROR);
-            return false;
+            throw new Exception('Can\'t find database configuration. Check /app/config/database.php');
         endif;
-        $datasource = Inflector::camelize("{$config['driver']}_datasource");
+
+        $datasource = Inflector::camelize($config['driver']) . 'Datasource';
+        
         if(isset($self->datasources[$environment])):
             return $self->datasources[$environment];
         elseif(self::loadDatasource($datasource)):
             $self->datasources[$environment] = new $datasource($config);
             return $self->datasources[$environment];
         else:
-            trigger_error("Can't find {$datasource} datasource", E_USER_ERROR);
-            return false;
+            throw new Exception('Can\'t find ' . $datasource . ' datasource');
         endif;
     }
     /**
@@ -64,9 +68,7 @@ class Connection extends Object {
      */
     public static function loadDatasource($datasource = null) {
         if(!class_exists($datasource)):
-            if(App::path("Datasource", Inflector::underscore($datasource))):
-                App::import("Datasource", Inflector::underscore($datasource));
-            endif;
+            import('core.model.datasources.' . $datasource);
         endif;
         return class_exists($datasource);
    }

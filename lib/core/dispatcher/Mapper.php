@@ -39,7 +39,7 @@ class Mapper extends Object {
             $this->here = self::normalize(substr($_SERVER["REQUEST_URI"], $start));
         endif;
     }
-    public static function getInstance() {
+    public static function &getInstance() {
         static $instance;
         if($instance === null):
             $c = __CLASS__;

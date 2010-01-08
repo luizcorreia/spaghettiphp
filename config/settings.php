@@ -43,6 +43,13 @@ Config::write('App.rewriteUrl', true);
 import('config.environments.' . Config::read('App.environment'));
 
 /**
+  *  Short description.
+  *
+  *  @todo documentation
+  */
+import('config.database');
+
+/**
   *  Define a configuração error_reporting do PHP de acordo com Debug.level, definida
   *  no environment atual usado pela aplicação.
   */

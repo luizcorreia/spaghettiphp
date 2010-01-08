@@ -16,11 +16,19 @@ Config::write("database", array(
         "prefix" => ""
     ),
     "production" => array(
-        "driver" => "",
+        "driver" => "mysql",
         "host" => "",
         "user" => "",
         "password" => "",
         "database" => "",
+        "prefix" => ""
+    ),
+    "test" => array(
+        "driver" => "mysql",
+        "host" => "localhost",
+        "user" => "root",
+        "password" => "",
+        "database" => "test",
         "prefix" => ""
     )
 ));
