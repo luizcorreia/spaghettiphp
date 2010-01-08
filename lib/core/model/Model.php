@@ -141,7 +141,6 @@ class Model extends Object {
     public function &connection($environment = null) {
         static $instance;
         if($instance === null):
-            $c = __CLASS__;
             $instance = Connection::datasource($environment);
         endif;
         
