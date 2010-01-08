@@ -14,14 +14,6 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     public function testMainInstanceShouldNotBeNewRecord() {
         $this->assertFalse($this->User->isNewRecord());
     }
-    public function testMainInstanceShouldNotBeEditable() {
-        $this->setExpectedException('BadMethodCallException');
-        $this->User->name = 'spaghettiphp';
-    }
-    public function testMainInstanceShouldNotBeReadable() {
-        $this->setExpectedException('Exception');
-        $name = $this->User->name;
-    }
     public function testShouldSetAndGetFieldForSingleRecord() {
         $user = $this->User->create();
         $user->name = $expected = 'spaghettiphp';
@@ -95,11 +87,6 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('spaghettiphp', $user->name);
         $this->assertEquals(md5('spaghettiphp'), $user->password);
         $this->assertFalse($user->admin);
-    }
-    public function testShouldNotOverwriteRecordWithCreate() {
-        $this->setExpectedException('BadMethodCallException');
-        $user = $this->User->create();
-        $user->create();
     }
     public function testShouldCreateANewEmptyRecord() {
         $user = $this->User->create();

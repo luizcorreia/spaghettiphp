@@ -29,10 +29,6 @@ class Model extends Object {
     /**
       *  Short description.
       */
-    protected $mainInstance = false;
-    /**
-      *  Short description.
-      */
     protected $newRecord = false;
     /**
       *  Short description.
@@ -51,9 +47,8 @@ class Model extends Object {
       *  @param boolean $mainInstance
       *  @return object $this
       */
-    public function __construct($record = null, $new_record = true, $main_instance = false) {
+    public function __construct($record = null, $new_record = true) {
         $this->newRecord = $new_record;
-        $this->mainInstance = $main_instance;
         
         if(is_callable($record)):
             // callbacks are available in PHP 5.3+ only
@@ -73,7 +68,6 @@ class Model extends Object {
       *  @return mixed
       */
     public function __get($name) {
-        $this->protectMainInstance();
         $name = $this->alias($name);
         if(in_array($name, $this->getters)):
             $getter = 'get' . Inflector::camelize($name);
@@ -92,7 +86,6 @@ class Model extends Object {
       *  @return mixed
       */
     public function __set($name, $value) {
-        $this->protectMainInstance();
         $name = $this->alias($name);
         if(in_array($name, $this->setters)):
             $setter = 'set' . Inflector::camelize($name);
@@ -153,7 +146,6 @@ class Model extends Object {
       *  @return object
       */
     public function create($record = null) {
-        $this->protectRecord();
         $class = get_class($this);
         return new $class($record, true);
     }
@@ -173,28 +165,6 @@ class Model extends Object {
       */
     public function isNewRecord() {
         return $this->newRecord;
-    }
-    /**
-      *  Short description.
-      *
-      *  @throws BadMethodCallException
-      *  @return void
-      */
-    protected function protectMainInstance() {
-        if($this->mainInstance):
-            throw new BadMethodCallException;
-        endif;
-    }
-    /**
-      *  Short description.
-      *
-      *  @throws BadMethodCallException
-      *  @return void
-      */
-    protected function protectRecord() {
-        if(!$this->mainInstance):
-            throw new BadMethodCallException;
-        endif;
     }
     /**
       *  Short description.
