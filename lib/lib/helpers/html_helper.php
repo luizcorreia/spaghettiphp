@@ -30,7 +30,7 @@ class HtmlHelper extends Helper {
         $html = "<{$tag}";
         $attr = $this->attr($attr);
         if(!empty($attr)):
-            $html .= " $attr";
+            $html .= " {$attr}";
         endif;
         $html .= ($empty ? " /" : "") . ">";
         return $html;
@@ -92,7 +92,7 @@ class HtmlHelper extends Helper {
             $url = $text;
         endif;
         $attr["href"] = Mapper::url($url, $full);
-        return $this->output($this->tag("a", $text, $attr));
+        return $this->tag("a", $text, $attr);
     }
     /**
      *  Cria um elemento de imagem para ser na aplicação.
@@ -103,32 +103,29 @@ class HtmlHelper extends Helper {
      *  @return string HTML da imagem a ser inserida
      */
     public function image($src, $attr = array(), $full = false) {
-        $attr = array_merge(
-            array(
-                "alt" => "",
-                "title" => isset($attr["alt"]) ? $attr["alt"] : ""
-            ),
-            $attr
+        $attr += array(
+            "alt" => "",
+            "title" => isset($attr["alt"]) ? $attr["alt"] : ""
         );
         if(!$this->external($src)):
             $src = Mapper::url("/images/" . $src, $full);
         endif;
         $attr["src"] = $src;
-        return $this->output($this->tag("img", null, $attr, true));
+        return $this->tag("img", null, $attr, true);
     }
     /**
-      *  Short description.
+      *  Cria um link de imagem.
       *
-      *  @param string $src
-      *  @param string $url
-      *  @param array $img_attr
-      *  @param array $attr
-      *  @param boolean $full
-      *  @return string
+      *  @param string $src Endereço da imagem
+      *  @param string $url URL para o link
+      *  @param array $img_attr Atributos da imagem
+      *  @param array $attr Atributos do link
+      *  @param boolean $full Verdadeiro para gerar uma URL completa
+      *  @return string HTML do link a ser inserido
       */
     public function imagelink($src, $url, $img_attr = array(), $attr = array(), $full = false) {
-        
-        return $this->link($this->image($src, $img_attr, $full), $url, $attr, $full);
+        $image = $this->image($src, $img_attr, $full);
+        return $this->link($image, $url, $attr, $full);
     }
     /**
      *  Cria elementos de folha de estilho para serem usados no HTML.
@@ -149,15 +146,12 @@ class HtmlHelper extends Helper {
             if(!$this->external($href)):
                 $href = Mapper::url("/styles/" . $this->extension($href, "css"), $full);
             endif;
-            $attr = array_merge(
-                array(
-                    "href" => $href,
-                    "rel" => "stylesheet",
-                    "type" => "text/css"
-                ),
-                $attr
+            $attr += array(
+                "href" => $href,
+                "rel" => "stylesheet",
+                "type" => "text/css"
             );
-            $output = $this->output($this->tag("link", null, $attr, true));
+            $output = $this->tag("link", null, $attr, true);
         endif;
         if($inline):
             return $output;
@@ -185,14 +179,11 @@ class HtmlHelper extends Helper {
             if(!$this->external($src)):
                 $src = Mapper::url("/scripts/" . $this->extension($src, "js"), $full);
             endif;
-            $attr = array_merge(
-                array(
-                    "src" => $src,
-                    "type" => "text/javascript"
-                ),
-                $attr
+            $attr += array(
+                "src" => $src,
+                "type" => "text/javascript"
             );
-            $output = $this->output($this->tag("script", null, $attr));
+            $output = $this->tag("script", null, $attr);
         endif;
         if($inline):
             return $output;
@@ -231,7 +222,7 @@ class HtmlHelper extends Helper {
         if(!is_array($attr)):
             $attr = array("class" => $attr);
         endif;
-        return $this->output($this->tag("div", $content, $attr));
+        return $this->tag("div", $content, $attr);
     }
     /**
      *  Adiciona uma meta tag para definir o charset da página.
@@ -240,14 +231,11 @@ class HtmlHelper extends Helper {
      *  @return string Tag META
      */
     public function charset($charset = null) {
-        if(is_null($charset)):
-            $charset = Config::read("appEncoding");
-        endif;
         $attr = array(
             "http-equiv" => "Content-type",
             "content" => "text/html; charset={$charset}"
         );
-        return $this->output($this->tag("meta", null, $attr));
+        return $this->tag("meta", null, $attr);
     }
     /**
      *  Verifica se uma URL é externa.
