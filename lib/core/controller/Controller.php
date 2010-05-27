@@ -1,10 +1,11 @@
 <?php
 
-class Controller extends Object {
+class Controller {
     public $autoRender = true;
     public $components = array();
     public $data = array();
     public $layout = 'default';
+    public $autoLayout = true;
     public $name = null;
     public $params = array();
     public $uses = null;
@@ -62,10 +63,8 @@ class Controller extends Object {
     }
     public function loadModels() {
         foreach($this->uses as $model):
-            if(!$this->{$model} = ClassRegistry::load($model)):
-                $this->error('missingModel', array('model' => $model));
-                return false;
-            endif;
+            // @todo check for errors here!
+            $this->{$model} = Loader::instance('Model', $model);
         endforeach;
         return true;
     }
@@ -86,15 +85,15 @@ class Controller extends Object {
     }
     public function render($action = null) {
         $view = new $this->viewClass;
-        $view->layout = $this->layout;
+        $view->controller = $this;
+        $layout = $this->autoLayout ? $this->layout : false;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
         endif;
 
         $this->autoRender = false;
-
-        return $view->render($action, $this->view, $this->layout);
+        return $view->render($action, $this->view, $layout);
     }
     public function redirect($url, $status = null, $exit = true) {
         $this->autoRender = false;
@@ -174,5 +173,17 @@ class Controller extends Object {
     }
     public function page($param = 'page') {
         return $this->param($param, 1);
+    }
+    public function isXhr() {
+        if(array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)):
+            return $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+        endif;
+        return false;
+    }
+    public function stop() {
+        exit(0);
+    }
+    protected function error($type, $details = array()) {
+        new Error($type, $details);
     }
 }

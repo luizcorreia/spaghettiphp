@@ -5,7 +5,7 @@ require 'lib/core/model/relationships/HasOne.php';
 require 'lib/core/model/relationships/HasMany.php';
 require 'lib/core/model/relationships/HasAndBelongsToMany.php';
 
-class Model extends Object {
+class Model {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
@@ -23,6 +23,7 @@ class Model extends Object {
     public $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
     public $pagination = array();
     protected $conn;
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -36,16 +37,15 @@ class Model extends Object {
         
         $this->setSource($this->table);
         
-        ClassRegistry::addObject(get_class($this), $this);
-        
         $this->createRelations();
+        Model::$instances[get_class($this)] = $this;
     }
     public function __call($method, $condition) {
         if(preg_match('/(all|first)By([\w]+)/', $method, $match)):
             $field = Inflector::underscore($match[2]);
             $params = array(
                 'conditions' => array(
-                    $field = $condition[0]
+                    $field => $condition[0]
                 )
             );
             if(isset($condition[1])):
@@ -57,12 +57,18 @@ class Model extends Object {
             return false;
         endif;
     }
+    /**
+     * @todo use static vars
+     */
     public function connection() {
         if(!$this->conn):
             $this->conn = Connection::get($this->connection);
         endif;
         return $this->conn;
     }
+    /**
+     * @todo refactor
+     */
     public function setSource($table) {
         $db = $this->connection();
         if($table):
@@ -78,6 +84,9 @@ class Model extends Object {
         endif;
         return true;
     }
+    /**
+     * @todo refactor
+     */
     public function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
@@ -107,7 +116,6 @@ class Model extends Object {
                 elseif(!isset($properties['className'])):
                     $associations[$key]['className'] = $key;
                 endif;
-                
                 // creates the actual relationship
                 $relationship = Inflector::camelize($type);
                 $associations[$key] = new $relationship($key, $associations[$key]);
@@ -116,6 +124,14 @@ class Model extends Object {
         
         return true;
     }
+    public function loadModel($model) {
+        // @todo check for errors here!
+        if(!array_key_exists($model, Model::$instances)):
+            Model::$instances[$model] = Loader::instance('Model', $model);
+        endif;
+        $this->{$model} = Model::$instances[$model];
+    }
+                
     public function query($query) {
         return $this->connection()->query($query);
     }
@@ -167,6 +183,7 @@ class Model extends Object {
         );
         $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
+        // @todo do we really need limits and offsets together here?
         $params['limit'] = $offset . ',' . $params['perPage'];
 
         $totalRecords = $this->count($params);
@@ -180,6 +197,9 @@ class Model extends Object {
 
         return $this->all($params);
     }
+    /**
+     * @todo refactor. check for fields
+     */
     public function toList($params = array()) {
         $params += array(
             'key' => $this->primaryKey,
@@ -220,6 +240,9 @@ class Model extends Object {
         
         return $db->update($params);
     }
+    /**
+     * @todo refactor
+     */
     public function save($data) {
         if(isset($data[$this->primaryKey]) && !is_null($data[$this->primaryKey])):
             $this->id = $data[$this->primaryKey];
@@ -256,6 +279,9 @@ class Model extends Object {
         $this->afterSave($created);
         return $save;
     }
+    /**
+     * @todo refactor
+     */
     public function validate($data) {
         $this->errors = array();
         $defaults = array(
@@ -289,6 +315,9 @@ class Model extends Object {
         endforeach;
         return empty($this->errors);
     }
+    /**
+     * @todo refactor
+     */
     public function callValidationMethod($params, $value) {
         $method = is_array($params) ? $params[0] : $params;
         $class = method_exists($this, $method) ? $this : 'Validation';
@@ -338,5 +367,8 @@ class Model extends Object {
     }
     public function escape($value) {
         return $this->connection()->escape($value);
+    }
+    protected function error($type, $details = array()) {
+        new Error($type, $details);
     }
 }
