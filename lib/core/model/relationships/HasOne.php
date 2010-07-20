@@ -1,5 +1,5 @@
 <?php
 
-class HasOne extends Object {
+class HasOne {
     
 }

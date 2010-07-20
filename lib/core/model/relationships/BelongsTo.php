@@ -1,5 +1,5 @@
 <?php
 
-class BelongsTo extends Object {
+class BelongsTo {
     
 }

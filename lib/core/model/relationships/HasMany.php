@@ -1,5 +1,5 @@
 <?php
 
-class HasMany extends Object {
+class HasMany {
     
 }

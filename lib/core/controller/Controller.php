@@ -1,98 +1,138 @@
 <?php
 
+require 'lib/core/controller/Component.php';
+require 'lib/core/controller/Exceptions.php';
+
 class Controller {
-    public $autoRender = true;
-    public $components = array();
-    public $data = array();
-    public $layout = 'default';
-    public $autoLayout = true;
-    public $name = null;
-    public $params = array();
-    public $uses = null;
-    public $view = array();
-    public $viewClass = 'View';
+    protected $autoLayout = true;
+    protected $autoRender = true;
+    protected $components = array();
+    protected $data = array();
+    protected $layout = 'default';
+    protected $name = null;
+    protected $params = array();
+    protected $uses = null;
+    protected $view = array();
 
     public function __construct() {
         if(is_null($this->name)):
-            $classname = get_class($this);
-            $lenght = strpos($classname, 'Controller');
-            $this->name = substr($classname, 0, $lenght);
+            $this->name = $this->name();
+        endif;
 
-            if(is_null($this->uses) && $this->name == 'App'):
-                $this->uses = array();
-            endif;
-        endif;
-        
         if(is_null($this->uses)):
-            $this->uses = array($this->name);
+            if($this->name == 'App'):
+                $this->uses = array();
+            else:
+                $this->uses = array($this->name);
+            endif;
         endif;
         
+        array_map(array($this, 'loadModel'), $this->uses);
+        array_map(array($this, 'loadComponent'), $this->components);
         $this->data = array_merge_recursive($_POST, $_FILES);
-        $this->loadComponents();
-        $this->loadModels();
     }
-    public function isAction($action) {
-        $methods = $this->getMethods();
-        return in_array($action, $methods) && can_call_method($this, $action);
+    public function name() {
+        $classname = get_class($this);
+        $lenght = strpos($classname, 'Controller');
+        
+        return substr($classname, 0, $lenght);
     }
-    public function getMethods() {
-        $child = get_class_methods($this);
-        $parent = get_class_methods('Controller');
-        return array_diff($child, $parent);
+    public function callAction($request) {
+        if($this->hasAction($request['action']) || Controller::hasViewForAction($request)):
+            return $this->dispatch($request);
+        else:
+            throw new MissingActionException(array(
+                'controller' => $request['controller'],
+                'action' => $request['action']
+            ));
+        endif;
     }
-    public function loadComponents() {
-        foreach($this->components as $component):
-            $component = $component . 'Component';
-            if(Loader::exists('Component', $component)):
-                $this->{$component} = Loader::instance('Component', $component);
-            else:
-                $this->error('missingComponent', array('component' => $component));
+    public function hasAction($action) {
+        $class = new ReflectionClass(get_class($this));
+        if($class->hasMethod($action)):
+            $method = $class->getMethod($action);
+            return $method->class != 'Controller' && $method->isPublic();
+        else:
+            return false;
+        endif;
+    }
+    protected function dispatch($request) {
+        $this->params = $request;
+        $this->componentEvent('initialize');
+        $this->beforeFilter();
+        $this->componentEvent('startup');
+    
+        if($this->hasAction($request['action'])):
+            $params = $request['params'];
+            if(!is_null($request['id'])):
+                array_unshift($params, $request['id']);
             endif;
-        endforeach;
-        return true;
+            call_user_func_array(array($this, $request['action']), $params);
+        endif;
+
+        $output = '';
+        if($this->autoRender):
+            $this->beforeRender();
+            $output = $this->render();
+        endif;
+
+        $this->componentEvent('shutdown');
+        $this->afterFilter();
+    
+        return $output;
     }
-    public function componentEvent($event) {
+    public static function hasViewForAction($request) {
+        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+    }
+    protected function loadModel($model) {
+        $model = Inflector::camelize($model);
+        if(Loader::exists('Model', $model)):
+            $this->{$model} = Loader::instance('Model', $model);
+        else:
+            throw new MissingModelException(array(
+                'model' => $model
+            ));
+        endif;
+    }
+    protected function loadComponent($component) {
+        // @todo refactor in method
+        $component = Inflector::camelize($component) . 'Component';
+        if(!class_exists($component) && Filesystem::exists('lib/components/' . $component . '.php')):
+            require_once 'lib/components/' . $component . '.php';
+        endif;
+        if(class_exists($component)):
+            return $this->{$component} = new $component();
+        else:
+            throw new MissingComponentException(array(
+                'component' => $component
+            ));
+        endif;
+    }
+    protected function componentEvent($event) {
         foreach($this->components as $component):
             $className = $component . 'Component';
-            if(can_call_method($this->$className, $event)):
-                $this->$className->{$event}($this);
-            else:
-                trigger_error('Can\'t call method ' . $event . ' in ' . $className, E_USER_WARNING);
-            endif;
+            $this->$className->{$event}($this);
         endforeach;
     }
-    public function loadModels() {
-        foreach($this->uses as $model):
-            // @todo check for errors here!
-            $this->{$model} = Loader::instance('Model', $model);
-        endforeach;
-        return true;
-    }
-    public function beforeFilter() {
-        return true;
-    }
-    public function beforeRender() {
-        return true;
-    }
-    public function afterFilter() {
-        return true;
-    }
+    protected function beforeFilter() { }
+    protected function beforeRender() { }
+    protected function afterFilter() { }
     public function setAction($action) {
-        $this->params['action'] = $action;
         $args = func_get_args();
-        array_shift($args);
-        return call_user_func_array(array(&$this, $action), $args);
+        $this->params['action'] = array_shift($args);
+        
+        return call_user_func_array(array($this, $action), $args);
     }
     public function render($action = null) {
-        $view = new $this->viewClass;
-        $view->controller = $this;
+        $view = new View;
         $layout = $this->autoLayout ? $this->layout : false;
+        $view->controller = $this;
+        $this->autoRender = false;
         
         if(is_null($action)):
             $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
         endif;
 
-        $this->autoRender = false;
         return $view->render($action, $this->view, $layout);
     }
     public function redirect($url, $status = null, $exit = true) {
@@ -149,27 +189,27 @@ class Controller {
             foreach($var as $key => $value):
                 $this->set($key, $value);
             endforeach;
-        elseif(!is_null($value)):
-            $this->view[$var] = $value;
+        else:
+            $this->view[$var] = $value;            
         endif;
-        
-        return $this;
     }
     public function get($var) {
-        if(isset($this->view[$var])):
+        if(array_key_exists($var, $this->view)):
             return $this->view[$var];
+        else:
+            return null;
         endif;
-        
-        return null;
     }
     public function param($key, $default = null) {
         if(array_key_exists($key, $this->params['named'])):
             return $this->params['named'][$key];
+            
         elseif(in_array($key, array_keys($this->params))):
             return $this->params[$key];
+            
+        else:
+            return $default;
         endif;
-        
-        return $default;
     }
     public function page($param = 'page') {
         return $this->param($param, 1);
@@ -182,8 +222,5 @@ class Controller {
     }
     public function stop() {
         exit(0);
-    }
-    protected function error($type, $details = array()) {
-        new Error($type, $details);
     }
 }

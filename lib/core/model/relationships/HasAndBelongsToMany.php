@@ -1,5 +1,5 @@
 <?php
 
-class HasAndBelongsToMany extends Object {
+class HasAndBelongsToMany {
     
 }
