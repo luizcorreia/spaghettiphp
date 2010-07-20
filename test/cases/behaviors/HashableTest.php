@@ -23,6 +23,7 @@ class HashableTest extends PHPUnit_Framework_TestCase {
         $data = $this->behavior->hash(array());
         $this->assertFalse(array_key_exists('password', $data));
     }
+    
     /**
      * @testdox hash should remove password if it is blank
      */

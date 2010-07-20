@@ -1,32 +1,30 @@
 <?php
 
-require 'lib/core/model/relationships/BelongsTo.php';
-require 'lib/core/model/relationships/HasOne.php';
-require 'lib/core/model/relationships/HasMany.php';
-require 'lib/core/model/relationships/HasAndBelongsToMany.php';
-require 'lib/core/model/Connection.php';
 require 'lib/core/model/Exceptions.php';
+require 'lib/core/model/Connection.php';
+require 'lib/core/model/Relationship.php';
 require 'lib/core/model/Behavior.php';
 
 class Model {
-    public $belongsTo = array();
-    public $hasMany = array();
-    public $hasOne = array();
-    public $id;
-    public $schema = array();
-    public $table;
-    public $primaryKey;
-    public $displayField;
-    public $connection;
-    public $order;
-    public $limit;
-    public $perPage = 20;
-    public $validates = array();
-    public $errors = array();
-    public $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
-    public $pagination = array();
+    protected $belongsTo = array();
+    protected $hasAndBelongsToMany = array();
+    protected $hasMany = array();
+    protected $hasOne = array();
+    protected $id;
+    protected $schema = array();
+    protected $table;
+    protected $primaryKey;
+    protected $displayField;
+    protected $connection;
+    protected $order;
+    protected $limit;
+    protected $perPage = 20;
+    protected $validates = array();
+    protected $errors = array();
+    protected $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
+    protected $pagination = array();
     protected $conn;
-    protected static $instances = array();
+    public static $instances = array();
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
@@ -131,26 +129,18 @@ class Model {
     }
     public function createRelations() {
         foreach($this->associations as $type):
-            $associations =& $this->{$type};
-            //foreach($associations as $key => $properties):
-            //    // normalizes the association
-            //    if(is_numeric($key)):
-            //        unset($associations[$key]);
-            //        if(is_array($properties)):
-            //            $associations[$key = $properties['className']] = $properties;
-            //        else:
-            //            $associations[$key = $properties] = array('className' => $properties);
-            //        endif;
-            //    elseif(!isset($properties['className'])):
-            //        $associations[$key]['className'] = $key;
-            //    endif;
-            //    // creates the actual relationship
-            //    $relationship = Inflector::camelize($type);
-            //    $associations[$key] = new $relationship($key, $associations[$key]);
-            //endforeach;
+            $associations = array();
+            $relationship = Inflector::camelize($type);
+            foreach($this->{$type} as $key => $properties):
+                if(is_array($properties)):
+                    $properties['name'] = $key;
+                else:
+                    $key = $properties;
+                endif;
+                $associations[$key] = new $relationship($properties);
+            endforeach;
+            $this->{$type} = $associations;
         endforeach;
-        
-        return true;
     }
     protected function loadBehaviors($behaviors) {
         foreach($this->behaviors as $key => $behavior):

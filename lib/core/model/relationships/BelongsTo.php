@@ -1,5 +1,5 @@
 <?php
 
-class BelongsTo {
+class BelongsTo extends Relationship {
     
 }

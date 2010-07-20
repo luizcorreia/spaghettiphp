@@ -1,5 +1,5 @@
 <?php
 
-class HasAndBelongsToMany {
+class HasAndBelongsToMany extends Relationship {
     
 }

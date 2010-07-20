@@ -1,5 +1,5 @@
 <?php
 
-class HasOne {
+class HasOne extends Relationship {
     
 }
