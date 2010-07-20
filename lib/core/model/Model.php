@@ -24,10 +24,10 @@ class Model {
     protected $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
     protected $pagination = array();
     protected $conn;
-    public static $instances = array();
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -73,6 +73,24 @@ class Model {
             //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
         endif;
+    }
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
+            endif;
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
+        endif;
+        
+        return Model::$instances[$name];
     }
     /**
      * @todo use static vars
@@ -121,11 +139,7 @@ class Model {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        // @todo check for errors here!
-        if(!array_key_exists($model, Model::$instances)):
-            Model::$instances[$model] = Loader::instance('Model', $model);
-        endif;
-        return $this->{$model} = Model::$instances[$model];
+        return $this->{$model} = Model::load($model);
     }
     public function createRelations() {
         foreach($this->associations as $type):
@@ -153,19 +167,9 @@ class Model {
         endforeach;
     }
     protected function loadBehavior($behavior, $options = array()) {
-        // @todo refactor in method
         $behavior = Inflector::camelize($behavior);
-        if(!class_exists($behavior) && Filesystem::exists('lib/behaviors/' . $behavior . '.php')):
-            require_once 'lib/behaviors/' . $behavior . '.php';
-        endif;
-        if(class_exists($behavior)):
-            $this->{$behavior} = new $behavior($this, $options);
-        else:
-            // @todo create exception
-            throw new MissingBehaviorException(array(
-                'behavior' => $behavior
-            ));
-        endif;
+        Behavior::load($behavior);
+        return $this->{$behavior} = new $behavior($this, $options);
     }
     
     public function register($type, $hook, $method) {

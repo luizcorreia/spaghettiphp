@@ -22,13 +22,7 @@ class Relationship {
         return $properties;
     }
     public function load() {
-        $model = $this->properties['className'];
-        // @todo check for errors here!
-        if(!array_key_exists($model, Model::$instances)):
-            Model::$instances[$model] = Loader::instance('Model', $model);
-        endif;
-        
-        return $this->model = Model::$instances[$model];
+        return $this->model = Model::load($this->properties['className']);
     }
     public function find() {}
     public function create() {}
