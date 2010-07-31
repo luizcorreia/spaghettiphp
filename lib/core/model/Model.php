@@ -549,28 +549,24 @@ class Model {
     }
     public function __get($field)
     {
-    	if( array_key_exists($field, $this->schema) ):
-	        if( array_key_exists($field, $this->data) ):
-	            return $this->data[$field];
-	        else:
-	            return null;
-	        endif;
-        else:
+    	if( !array_key_exists($field, $this->schema) ):
             throw new MissingModelFieldException(array(
                 'field'=>$field
                 ,'model'=>get_class($this)
             ));
         endif;
+        
+        return array_key_exists($field, $this->data) ? $this->data[$field] : null;
     }
     public function __set($field, $value)
     {
-    	if( array_key_exists($field, $this->schema) ):
-            $this->data[$field] = $value;
-        else:
+    	if( !array_key_exists($field, $this->schema) ):
             throw new MissingModelFieldException(array(
                 'field'=>$field
                 ,'model'=>get_class($this)
             ));
         endif;
+        
+        $this->data[$field] = $value;
     }
 }
