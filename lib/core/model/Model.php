@@ -8,7 +8,6 @@ class Model {
     public $belongsTo = array();
     public $hasMany = array();
     public $hasOne = array();
-    public $id;
     public $recursion = 0;
     public $schema = array();
     public $table;
@@ -37,6 +36,7 @@ class Model {
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
+    protected $data = array();
 
     public function __construct() {
         if(!$this->connection):
