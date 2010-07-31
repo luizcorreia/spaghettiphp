@@ -547,4 +547,30 @@ class Model {
     public function escape($value) {
         return $this->connection()->escape($value);
     }
+    public function __get($field)
+    {
+    	if( array_key_exists($field, $this->schema) ):
+	        if( array_key_exists($field, $this->data) ):
+	            return $this->data[$field];
+	        else:
+	            return null;
+	        endif;
+        else:
+            throw new MissingModelFieldException(array(
+                'field'=>$field
+                ,'model'=>get_class($this)
+            ));
+        endif;
+    }
+    public function __set($field, $value)
+    {
+    	if( array_key_exists($field, $this->schema) ):
+            $this->data[$field] = $value;
+        else:
+            throw new MissingModelFieldException(array(
+                'field'=>$field
+                ,'model'=>get_class($this)
+            ));
+        endif;
+    }
 }

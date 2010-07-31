@@ -25,3 +25,11 @@ class MissingBehaviorMethodException extends InternalErrorException {
         parent::__construct($message, 0, $details);
     }
 }
+
+class MissingModelFieldException extends MissingException {
+    public function __construct($details = array()) {
+        $message = 'Missing Model Field';
+        $details = 'The field <code>' . $details['field'] . '</code> could not be found, in model <code>' . $details['model'] . '</code>.';
+        parent::__construct($message, 0, $details);
+    }
+}
