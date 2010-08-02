@@ -82,11 +82,7 @@ class Controller {
         $this->componentEvent('startup');
     
         if($this->hasAction($request['action'])):
-            $params = $request['params'];
-            if(!is_null($request['id'])):
-                array_unshift($params, $request['id']);
-            endif;
-            call_user_func_array(array($this, $request['action']), $params);
+            call_user_func_array(array($this, $request['action']), $request['params']);
         endif;
 
         $output = '';
@@ -130,7 +126,7 @@ class Controller {
         $this->autoRender = false;
         
         if(is_null($action)):
-            $action = Inflector::underscore($this->name) . '/' . $this->params['action'];
+            $action = Inflector::underscore($this->name) . '/' . $this->params['action'] . '.' . $this->params['extension'];
         endif;
 
         return $view->render($action, $this->view, $layout);
@@ -223,5 +219,4 @@ class Controller {
     public function stop() {
         exit(0);
     }
-
 }
