@@ -27,48 +27,35 @@ Connection::add(array(
     )
 ));
 
-class Users extends AppModel
-{	
-	public $connection = 'test';
+class Users extends AppModel {    
+    public $connection = 'test';
 }
 
 class ModelTest extends PHPUnit_Framework_TestCase {
-	public $Users = null;
-	
-    public function setUp()
-    {
-        $this->Users = new Users();
+    public $users = null;
+    
+    public function setUp() {
+        $this->users = new Users();
     }
-    public function tearDown()
-    {
-        $this->Users = null;
+    public function tearDown() {
+        $this->users = null;
     }
     
     /**
      * @expectedException MissingModelFieldException
      */
-    public function testTheThrowExceptionWhenFieldNotFoundInSchemaOnGetting()
-    {
-        $undefined = $this->Users->undefined;
+    public function testTheThrowExceptionWhenFieldNotFoundInSchemaOnGetting() {
+        $undefined = $this->users->undefined;
     }
     
     /**
      * @expectedException MissingModelFieldException
      */
-    public function testTheThrowExceptionWhenFieldNotFoundInSchemaOnSetting()
-    {
-    	$this->Users->undefined = 'Nothing';
+    public function testTheThrowExceptionWhenFieldNotFoundInSchemaOnSetting() {
+        $this->users->undefined = 'Nothing';
     }
     
-    public function testTheNullReturnIfObjectIsEmpty()
-    {
-        $this->assertNull($this->Users->username);
-    }
-    
-    /**
-     * @testdox the truth
-     */
-    public function testTheTruth() {
-        $this->assertTrue(true);
+    public function testTheNullReturnIfObjectIsEmpty() {
+        $this->assertNull($this->users->username);
     }
 }
