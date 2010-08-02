@@ -32,11 +32,11 @@ class Model {
         'page' => 0
     );
     protected $conn;
-    protected static $instances = array();
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
     protected $data = array();
+    protected static $instances = array();
 
     public function __construct() {
         if(!$this->connection):
@@ -47,8 +47,6 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         $this->setSource($this->table);
-        Model::$instances[get_class($this)] = $this;
-        $this->createLinks();
         
         $this->loadBehaviors($this->behaviors);
     }
@@ -80,6 +78,24 @@ class Model {
             //trigger_error('Call to undefined method Model::' . $method . '()', E_USER_ERROR);
             return false;
         endif;
+    }
+    public static function load($name) {
+        if(!array_key_exists($name, Model::$instances)):
+            if(!class_exists($name) && Filesystem::exists('app/models/' . Inflector::underscore($name) . '.php')):
+                require_once 'app/models/' . Inflector::underscore($name) . '.php';
+            endif;
+            if(class_exists($name)):
+                Model::$instances[$name] = new $name();
+                // @todo remove this
+                Model::$instances[$name]->createLinks();
+            else:
+                throw new MissingModelException(array(
+                    'model' => $name
+                ));
+            endif;
+        endif;
+        
+        return Model::$instances[$name];
     }
     /**
      * @todo use static vars
@@ -127,11 +143,7 @@ class Model {
         return $this->schema = $schema;
     }
     public function loadModel($model) {
-        // @todo check for errors here!
-        if(!array_key_exists($model, Model::$instances)):
-            Model::$instances[$model] = Loader::instance('Model', $model);
-        endif;
-        return $this->{$model} = Model::$instances[$model];
+        return $this->{$model} = Model::load($model);
     }
     public function createLinks() {
         foreach(array_keys($this->associations) as $type):
@@ -193,19 +205,9 @@ class Model {
         endforeach;
     }
     protected function loadBehavior($behavior, $options = array()) {
-        // @todo refactor in method
         $behavior = Inflector::camelize($behavior);
-        if(!class_exists($behavior) && Filesystem::exists('lib/behaviors/' . $behavior . '.php')):
-            require_once 'lib/behaviors/' . $behavior . '.php';
-        endif;
-        if(class_exists($behavior)):
-            $this->{$behavior} = new $behavior($this, $options);
-        else:
-            // @todo create exception
-            throw new MissingBehaviorException(array(
-                'behavior' => $behavior
-            ));
-        endif;
+        Behavior::load($behavior);
+        return $this->{$behavior} = new $behavior($this, $options);
     }
     
     public function register($type, $hook, $method) {
@@ -549,20 +551,24 @@ class Model {
     }
     public function __get($field) {
         if(!array_key_exists($field, $this->schema)):
-            throw new MissingModelFieldException(array(
-                'field' => $field,
-                'model' => get_class($this)
-            ));
+            // @todo re-enable this
+            // throw new MissingModelFieldException(array(
+            //     'field' => $field,
+            //     'model' => get_class($this)
+            // ));
+            return $this->{$field};
         endif;
         
         return array_key_exists($field, $this->data) ? $this->data[$field] : null;
     }
     public function __set($field, $value) {
         if(!array_key_exists($field, $this->schema)):
-            throw new MissingModelFieldException(array(
-                'field' => $field,
-                'model' => get_class($this)
-            ));
+            // @todo re-enable this
+            // throw new MissingModelFieldException(array(
+            //     'field' => $field,
+            //     'model' => get_class($this)
+            // ));
+            $this->{$field} = $value;
         endif;
         
         $this->data[$field] = $value;
