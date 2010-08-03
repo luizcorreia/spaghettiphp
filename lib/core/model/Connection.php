@@ -29,12 +29,12 @@ class Connection {
     }
     public static function get($connection) {
         $self = self::instance();
-        if(!array_key_exists($connection, $self->config)):
-            trigger_error('Can\'t find database configuration. Check /config/connections.php', E_USER_ERROR);
-            return false;
-        endif;
-        $config = $self->config[$connection];
         if(!array_key_exists($connection, $self->connections)):
+            if(!array_key_exists($connection, $self->config)):
+                trigger_error('Can\'t find database configuration. Check /config/connections.php', E_USER_ERROR);
+                return false;
+            endif;
+            $config = $self->config[$connection];
             $self->connections[$connection] = self::create($config);
         endif;
         
