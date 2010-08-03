@@ -6,7 +6,7 @@ require 'lib/core/model/Relationship.php';
 require 'lib/core/model/Behavior.php';
 
 class Model extends Hookable {
-    protected $id;
+    public $id;
     protected $primaryKey;
     protected $schema = array();
     protected $table;

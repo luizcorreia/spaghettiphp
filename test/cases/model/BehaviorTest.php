@@ -106,14 +106,6 @@ class BehaviorTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @testdox fireAction should throw exception when firing missing methods
-     * @expectedException MissingBehaviorMethodException
-     */
-    public function testFireActionShouldThrowExceptionWhenFiringMissingMethods() {
-        $this->model->fireAction('exception');
-    }
-
-    /**
      * @testdox fireAction should accept parameters
      */
     public function testFireActionShouldAcceptParameter() {
