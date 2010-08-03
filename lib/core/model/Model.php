@@ -6,31 +6,38 @@ require 'lib/core/model/Relationship.php';
 require 'lib/core/model/Behavior.php';
 
 class Model {
+    protected $id;
+    protected $primaryKey;
+    protected $schema = array();
+    protected $table;
+
+    protected $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
     protected $belongsTo = array();
     protected $hasAndBelongsToMany = array();
     protected $hasMany = array();
     protected $hasOne = array();
-    protected $id;
-    protected $schema = array();
-    protected $table;
-    protected $primaryKey;
-    protected $displayField;
-    protected $connection;
-    protected $order;
-    protected $limit;
-    protected $perPage = 20;
-    protected $validates = array();
-    protected $errors = array();
-    protected $associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
-    protected $pagination = array();
-    protected $conn;
+
     protected $behaviors = array();
     protected $actions = array();
     protected $filters = array();
+
+    protected $displayField;
+
+    protected $order;
+    protected $limit;
+
+    protected $perPage = 20;
+    protected $pagination = array();
+
+    protected $validates = array();
+    protected $errors = array();
+
+    protected $connection;
+
     protected static $instances = array();
 
     public function __construct() {
-        if(!$this->connection):
+        if(is_null($this->connection)):
             $this->connection = Config::read('App.environment');
         endif;
         
@@ -39,6 +46,7 @@ class Model {
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
         endif;
         
+        // @todo move to the first query
         $this->setSource($this->table);
         
         $this->createRelations();
@@ -92,14 +100,8 @@ class Model {
         
         return Model::$instances[$name];
     }
-    /**
-     * @todo use static vars
-     */
     public function connection() {
-        if(!$this->conn):
-            $this->conn = Connection::get($this->connection);
-        endif;
-        return $this->conn;
+        return Connection::get($this->connection);
     }
     /**
      * @todo refactor
