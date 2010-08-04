@@ -30,7 +30,7 @@ class Model extends Hookable {
     protected $validates = array();
     protected $errors = array();
 
-    public $connection = 'default';
+    protected $connection = 'default';
 
     protected static $instances = array();
 
