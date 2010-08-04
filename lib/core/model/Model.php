@@ -36,7 +36,7 @@ class Model extends Hookable {
     protected $data = array();
     protected static $instances = array();
 
-    public function __construct() {
+    public function __construct($data = array()) {
         if(is_null($this->table)):
             $database = Connection::getConfig($this->connection);
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
@@ -44,6 +44,10 @@ class Model extends Hookable {
         $this->setSource($this->table);
 
         $this->loadBehaviors($this->behaviors);
+        
+        if(!empty($data)):
+            $this->data = array_intersect_key($data, $this->schema);
+        endif;
     }
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
