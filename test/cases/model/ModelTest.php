@@ -37,4 +37,10 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     public function testTheNullReturnIfObjectIsEmpty() {
         $this->assertNull($this->users->username);
     }
+    
+    public function testCreateMethodReturnSelfClassObject() {
+        $expected = get_class($this->users);
+        $actual = get_class($this->users->create());
+        $this->assertEquals($expected, $actual);
+    }
 }

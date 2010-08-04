@@ -522,4 +522,8 @@ class Model extends Hookable {
         
         $this->data[$field] = $value;
     }
+    public function create($data = array()) {
+        $thisClass = get_class($this);
+        return new $thisClass($data);
+    }
 }
