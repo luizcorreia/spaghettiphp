@@ -3,22 +3,22 @@
 class Mapper {
     protected $prefixes = array();
     protected $routes = array();
-    protected $base;
+    protected $base = '/';
     protected $here = '/';
     protected $domain = 'http://localhost';
     protected $root;
     protected static $instance;
 
     public function __construct() {
-        $this->base = dirname($_SERVER['PHP_SELF']);
-        if(basename($this->base) == 'public'):
-            $this->base = dirname($this->base);
-            if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
-                $this->base = '/';
-            endif;
-        endif;
-
         if(array_key_exists('REQUEST_URI', $_SERVER) && array_key_exists('HTTP_HOST', $_SERVER)):
+            $this->base = dirname($_SERVER['PHP_SELF']);
+            if(basename($this->base) == 'public'):
+                $this->base = dirname($this->base);
+                if($this->base == DIRECTORY_SEPARATOR || $this->base == '.'):
+                    $this->base = '/';
+                endif;
+            endif;
+
             $start = strlen($this->base);
             $this->here = self::normalize(substr($_SERVER['REQUEST_URI'], $start));
             $this->domain = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'];
