@@ -368,7 +368,7 @@ class Model extends Hookable {
 
         // verify if the record exists
         $exists = $this->exists(array(
-            $this->primaryKey => $this->{$this->primaryKey}
+            $this->primaryKey => $this->id
         ));
 
         // apply created timestamp
@@ -389,14 +389,14 @@ class Model extends Hookable {
         if($exists):
             $save = $this->update(array(
                 'conditions' => array(
-                    $this->primaryKey => $this->{$this->primaryKey}
+                    $this->primaryKey => $this->id
                 ),
                 'limit' => 1
             ), $data);
         // or insert a new one if it doesn't
         else:
             $save = $this->insert($data);
-            $this->data[$this->primaryKey] = $this->getInsertId();
+            $this->id = $this->getInsertId();
         endif;
         
         $this->data = $this->first(array(
