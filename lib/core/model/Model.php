@@ -48,9 +48,6 @@ class Model extends Hookable {
         
         // @todo move to the first query
         $this->setSource($this->table);
-        
-        $this->createRelations();
-        Model::$instances[get_class($this)] = $this;        
 
         $this->loadBehaviors($this->behaviors);
         
@@ -95,7 +92,7 @@ class Model extends Hookable {
             if(class_exists($name)):
                 Model::$instances[$name] = new $name();
                 // @todo remove this
-                Model::$instances[$name]->createLinks();
+                Model::$instances[$name]->createRelations();
             else:
                 throw new MissingModelException(array(
                     'model' => $name
@@ -333,7 +330,7 @@ class Model extends Hookable {
         
         $this->data = $this->first(array(
             'conditions' => array(
-                $this->primaryKey => $this->data[$this->primaryKey]
+                $this->primaryKey => $this->id
             )
         ));
         
