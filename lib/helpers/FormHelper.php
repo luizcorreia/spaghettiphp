@@ -93,7 +93,7 @@ class FormHelper extends Helper {
             'value' => $value
         );
         
-        return $this->html->tag('input', null, $attr, true);
+        return $this->html->tag('input', null, $attr);
     }
     public function imagesubmit($value, $attr = array()) {
         $attr += array(
@@ -102,7 +102,7 @@ class FormHelper extends Helper {
             'src' => $this->assets->image($value)
         );
         
-        return $this->html->tag('input', null, $attr, true);
+        return $this->html->tag('input', null, $attr);
     }
     public function button($value, $type = 'submit', $attr = array()) {
         $attr += array(
@@ -128,7 +128,7 @@ class FormHelper extends Helper {
             'name' => $this->name($name)
         );
         
-        return $this->html->tag('input', null, $attr, true);
+        return $this->html->tag('input', null, $attr);
     }
     protected function id($id) {
         return $this->model() . '_' . $id;
