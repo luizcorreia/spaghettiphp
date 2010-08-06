@@ -33,10 +33,25 @@ class Model extends Hookable {
     protected $connection = 'default';
 
     protected $data = array();
+    
+    protected $beforeSave = array();
+    protected $beforeCreate = array();
+    protected $beforeUpdate = array();
+    protected $beforeDelete = array();
+    protected $beforeValidate = array();
+
+    protected $afterSave = array();
+    protected $afterCreate = array();
+    protected $afterUpdate = array();
+    protected $afterDelete = array();
+    protected $afterValidate = array();
 
     protected static $instances = array();
 
     public function __construct() {
+        $this->initialize();
+    }
+    protected function initialize() {
         if(is_null($this->connection)):
             $this->connection = Config::read('App.environment');
         endif;
