@@ -82,6 +82,11 @@ class FormHelper extends Helper {
             'name' => $this->name($name),
             'value' => null
         );
+        
+        if(array_key_exists('empty', $attr)):
+            $options = $this->addEmptyOption($options, array_unset($attr, 'empty'));
+        endif;
+        
         $options = $this->options($options, array_unset($attr, 'value'));
         
         return $this->html->tag('select', $options, $attr);
@@ -149,5 +154,18 @@ class FormHelper extends Helper {
         endforeach;
         
         return $content;
+    }
+    protected function addEmptyOption($options, $empty) {
+        if(is_array($empty)):
+            $options = $empty + $options;
+        else:
+            if($empty === true):
+                $empty = '';
+            endif;
+        
+            array_unshift($options, $empty);
+        endif;
+        
+        return $options;
     }
 }

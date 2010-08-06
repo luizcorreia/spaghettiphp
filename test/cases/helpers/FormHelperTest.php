@@ -217,6 +217,60 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @testdox select with attribute empty=true should add empty option
+     */
+    public function testSelectWithEmptyAttributeShouldAddEmptyOption() {
+        $expected  = '<select id="users_role" name="users[role]">';
+        $expected .= '<option value="0"></option><option value="user">User</option>';
+        $expected .= '<option value="admin">Admin</option></select>';
+        $this->form->create('users');
+        $actual = $this->form->select('role', array(
+            'user' => 'User',
+            'admin' => 'Admin'
+        ), array(
+            'empty' => true
+        ));
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox select with attribute empty=array should add empty option
+     */
+    public function testSelectWithEmptyArrayAttributeShouldAddEmptyOption() {
+        $expected  = '<select id="users_role" name="users[role]">';
+        $expected .= '<option value="empty">Empty</option><option value="user">User</option>';
+        $expected .= '<option value="admin">Admin</option></select>';
+        $this->form->create('users');
+        $actual = $this->form->select('role', array(
+            'user' => 'User',
+            'admin' => 'Admin'
+        ), array(
+            'empty' => array('empty' => 'Empty')
+        ));
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox select with attribute empty=string should add empty option
+     */
+    public function testSelectWithEmptyStringAttributeShouldAddEmptyOption() {
+        $expected  = '<select id="users_role" name="users[role]">';
+        $expected .= '<option value="0">Empty</option><option value="user">User</option>';
+        $expected .= '<option value="admin">Admin</option></select>';
+        $this->form->create('users');
+        $actual = $this->form->select('role', array(
+            'user' => 'User',
+            'admin' => 'Admin'
+        ), array(
+            'empty' => 'Empty'
+        ));
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * @testdox submit should return a input with type=submit
      */
     public function testSubmitShouldReturnAInputWithTypeSubmit() {
