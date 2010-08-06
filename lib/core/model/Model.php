@@ -32,6 +32,8 @@ class Model extends Hookable {
 
     protected $connection = 'default';
 
+    protected $data = array();
+
     protected static $instances = array();
 
     public function __construct() {
@@ -51,6 +53,10 @@ class Model extends Hookable {
         Model::$instances[get_class($this)] = $this;        
 
         $this->loadBehaviors($this->behaviors);
+        
+        if(!empty($data)):
+            $this->data = array_intersect_key($data, $this->schema);
+        endif;
     }
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
@@ -281,9 +287,9 @@ class Model extends Hookable {
     /**
      * @todo refactor
      */
-    public function save($data) {
-        if(!is_null($this->id)):
-            $data[$this->primaryKey] = $this->id;
+    public function save($data = array()) {        
+        if(empty($data)):
+            $data = $this->data;
         endif;
 
         // apply modified timestamp
@@ -324,7 +330,13 @@ class Model extends Hookable {
             $save = $this->insert($data);
             $this->id = $this->getInsertId();
         endif;
-
+        
+        $this->data = $this->first(array(
+            'conditions' => array(
+                $this->primaryKey => $this->data[$this->primaryKey]
+            )
+        ));
+        
         // fire afterSave action
         $this->fireAction('afterSave');
 
@@ -415,5 +427,33 @@ class Model extends Hookable {
     }
     public function escape($value) {
         return $this->connection()->escape($value);
+    }
+    public function __get($field) {
+        if(!array_key_exists($field, $this->schema)):
+            // @todo re-enable this
+            // throw new MissingModelFieldException(array(
+            //     'field' => $field,
+            //     'model' => get_class($this)
+            // ));
+            return $this->{$field};
+        endif;
+        
+        return array_key_exists($field, $this->data) ? $this->data[$field] : null;
+    }
+    public function __set($field, $value) {
+        if(!array_key_exists($field, $this->schema)):
+            // @todo re-enable this
+            // throw new MissingModelFieldException(array(
+            //     'field' => $field,
+            //     'model' => get_class($this)
+            // ));
+            $this->{$field} = $value;
+        endif;
+        
+        $this->data[$field] = $value;
+    }
+    public function create($data = array()) {
+        $thisClass = get_class($this);
+        return new $thisClass($data);
     }
 }
