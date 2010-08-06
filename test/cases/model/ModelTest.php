@@ -60,4 +60,36 @@ class ModelTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals($expected, $actual);
     }
+
+    public function testCreateMethodReturnSelfClassObject() {
+        $expected = get_class($this->users);
+        $actual = get_class($this->users->create());
+        $this->assertEquals($expected, $actual);
+    }
+    
+    public function testSaveMethodSetTheFieldsOnInserting() {
+        $user = $this->users->create();
+        $user->username = 'username';
+        $user->password = 'password';
+        $user->save();
+        
+        $this->assertNotNull($user->id);
+        $this->assertNotNull($user->username);
+        $this->assertNotNull($user->password);
+        $this->assertNotNull($user->created);
+        $this->assertNotNull($user->modified);
+    }
+    
+    public function testSaveMethodSetTheFieldsOnUpdate() {
+        $user = $this->users->create();
+        $user->username = 'username2';
+        $user->password = 'password2';
+        $user->save();
+        
+        $user->username = 'username2Update';
+        $user->save();
+        
+        $this->assertEquals('username2Update', $user->username);
+        $this->assertEquals('password2', $user->password);
+    }
 }

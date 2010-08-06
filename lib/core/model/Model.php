@@ -36,7 +36,7 @@ class Model extends Hookable {
     protected $data = array();
     protected static $instances = array();
 
-    public function __construct() {
+    public function __construct($data = array()) {
         if(is_null($this->table)):
             $database = Connection::getConfig($this->connection);
             $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
@@ -44,6 +44,10 @@ class Model extends Hookable {
         $this->setSource($this->table);
 
         $this->loadBehaviors($this->behaviors);
+        
+        if(!empty($data)):
+            $this->data = array_intersect_key($data, $this->schema);
+        endif;
     }
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
@@ -351,9 +355,9 @@ class Model extends Hookable {
     /**
      * @todo refactor
      */
-    public function save($data) {
-        if(!is_null($this->id)):
-            $data[$this->primaryKey] = $this->id;
+    public function save($data = array()) {        
+        if(empty($data)):
+            $data = $this->data;
         endif;
 
         // apply modified timestamp
@@ -394,7 +398,13 @@ class Model extends Hookable {
             $save = $this->insert($data);
             $this->id = $this->getInsertId();
         endif;
-
+        
+        $this->data = $this->first(array(
+            'conditions' => array(
+                $this->primaryKey => $this->data[$this->primaryKey]
+            )
+        ));
+        
         // fire afterSave action
         $this->fireAction('afterSave');
 
@@ -521,5 +531,9 @@ class Model extends Hookable {
         endif;
         
         $this->data[$field] = $value;
+    }
+    public function create($data = array()) {
+        $thisClass = get_class($this);
+        return new $thisClass($data);
     }
 }
