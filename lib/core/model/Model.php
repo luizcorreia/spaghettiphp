@@ -191,7 +191,7 @@ class Model extends Hookable {
         $db = $this->connection();
         $params += array(
             'table' => $this->table,
-            'fields' => array_keys($this->schema),
+            'fields' => '*',
             'order' => $this->order,
             'limit' => $this->limit
         );
@@ -220,11 +220,9 @@ class Model extends Hookable {
             'perPage' => $this->perPage,
             'page' => 1
         );
-        $page = !$params['page'] ? 1 : $params['page'];
         $offset = ($page - 1) * $params['perPage'];
-        // @todo do we really need limits and offsets together here?
-        $params['limit'] = $offset . ',' . $params['perPage'];
-
+        $params['offset'] = $offset;
+        $params['limit'] = $params['perPage'];
         $totalRecords = $this->count($params);
         $this->pagination = array(
             'totalRecords' => $totalRecords,
@@ -236,15 +234,17 @@ class Model extends Hookable {
 
         return $this->all($params);
     }
-    /**
-     * @todo refactor. check for fields
-     */
     public function toList($params = array()) {
+        $db = $this->connection();
         $params += array(
             'key' => $this->primaryKey,
-            'displayField' => $this->displayField
+            'displayField' => $this->displayField,
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
-        $all = $this->all($params);
+        $params['fields'] = array($params['key'], $params['displayField']);
+        $all = $db->read($params);
         $results = array();
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
