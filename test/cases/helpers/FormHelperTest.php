@@ -3,6 +3,7 @@
 require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/test.php';
 require_once 'lib/helpers/FormHelper.php';
+require_once 'test/classes/models/Users.php';
 
 class FormHelperTest extends PHPUnit_Framework_TestCase {
     public function setUp() {
@@ -56,7 +57,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
     public function testCreateShouldPushToTheFormStack() {
         $expected = 'users';
         $this->form->create('users');
-        $actual = $this->form->model();
+        $actual = $this->form->modelname();
         
         $this->assertEquals($expected, $actual);
     }
@@ -68,7 +69,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
         $expected = null;
         $this->form->create('users');
         $this->form->close();
-        $actual = $this->form->model();
+        $actual = $this->form->modelname();
         
         $this->assertEquals($expected, $actual);
     }
@@ -310,6 +311,64 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
         $expected = '<button name="commit" type="button">OK</button>';
         $this->form->create('users');
         $actual = $this->form->button('OK', 'button');
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox text should add model value to input
+     */
+    public function testTextShouldAddModelValueToInput() {
+        $expected = '<input value="spaghettiphp" type="text" id="users_username" name="users[username]" />';
+        $user = new Users();
+        $user->username = 'spaghettiphp';
+        $this->form->create($user);
+        $actual = $this->form->text('username');
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox textarea should add model value to tag
+     */
+    public function testTextareaShouldAddModelValueToTag() {
+        $expected = '<textarea id="users_description" name="users[description]">Spaghetti* Framework</textarea>';
+        $user = new Users();
+        $user->description = 'Spaghetti* Framework';
+        $this->form->create($user);
+        $actual = $this->form->textarea('description');
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox select should select option from model value
+     */
+    public function testSelectShouldSelectOptionFromModelValue() {
+        $expected  = '<select id="users_role" name="users[role]">';
+        $expected .= '<option value="user">User</option>';
+        $expected .= '<option value="admin" selected="selected">Admin</option></select>';
+
+        $user = new Users();
+        $user->role = 'admin';
+        $this->form->create($user);
+        $actual = $this->form->select('role', array(
+            'user' => 'User',
+            'admin' => 'Admin'
+        ));
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox radio should add model value to input
+     */
+    public function testRadioShouldAddModelValueToInput() {
+        $expected = '<input value="yes" id="users_newsletter_yes" checked="checked" type="radio" name="users[newsletter]" />';
+        $user = new Users();
+        $user->newsletter = 'yes';
+        $this->form->create($user);
+        $actual = $this->form->radio('newsletter', 'yes');
         
         $this->assertEquals($expected, $actual);
     }

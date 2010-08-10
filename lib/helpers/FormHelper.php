@@ -41,7 +41,7 @@ class FormHelper extends Helper {
         $attr += array(
             'id' => $this->id($name),
             'name' => $this->name($name),
-            'value' => ''
+            'value' => $this->value($name)
         );
         
         return $this->html->tag('textarea', array_unset($attr, 'value'), $attr);
@@ -71,7 +71,8 @@ class FormHelper extends Helper {
     public function radio($name, $value, $attr = array()) {
         $attr += array(
             'value' => $value,
-            'id' => $this->id($name) . '_' . Inflector::underscore($value)
+            'id' => $this->id($name) . '_' . Inflector::underscore($value),
+            'checked' => $value == $this->value($name)
         );
         
         return $this->input($name, 'radio', $attr);
@@ -80,7 +81,7 @@ class FormHelper extends Helper {
         $attr += array(
             'id' => $this->id($name),
             'name' => $this->name($name),
-            'value' => null
+            'value' => $this->value($name)
         );
         
         if(array_key_exists('empty', $attr)):
@@ -117,7 +118,27 @@ class FormHelper extends Helper {
         
         return $this->html->tag('button', $value, $attr);
     }
-    public function model() {
+    protected function input($name, $type, $attr) {
+        $attr += array(
+            'value' => $this->value($name),
+            'type' => $type,
+            'id' => $this->id($name),
+            'name' => $this->name($name)
+        );
+        
+        
+        return $this->html->tag('input', null, $attr);
+    }
+    protected function model() {
+        $object = end($this->stack);
+        
+        if(is_object($object)):
+            return $object;
+        endif;
+        
+        return false;
+    }
+    public function modelname() {
         $object = end($this->stack);
         
         if(is_object($object)):
@@ -126,20 +147,20 @@ class FormHelper extends Helper {
         
         return Inflector::underscore($object);
     }
-    protected function input($name, $type, $attr) {
-        $attr += array(
-            'type' => $type,
-            'id' => $this->id($name),
-            'name' => $this->name($name)
-        );
-        
-        return $this->html->tag('input', null, $attr);
-    }
     protected function id($id) {
-        return $this->model() . '_' . $id;
+        return $this->modelname() . '_' . $id;
     }
     protected function name($name) {
-        return $this->model() . '[' . $name . ']';
+        return $this->modelname() . '[' . $name . ']';
+    }
+    protected function value($name) {
+        if($model = $this->model()):
+            if(!is_null($model->{$name})):
+                return $model->{$name};
+            endif;
+        endif;
+        
+        return false;
     }
     protected function options($options, $selected) {
         $content = '';
