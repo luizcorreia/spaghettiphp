@@ -247,7 +247,10 @@ class Model extends Hookable {
     public function toList($params = array()) {
         $params += array(
             'key' => $this->primaryKey,
-            'displayField' => $this->displayField
+            'displayField' => $this->displayField,
+            'table' => $this->table,
+            'order' => $this->order,
+            'limit' => $this->limit
         );
         $params['fields'] = array($params['key'], $params['displayField']);
 
