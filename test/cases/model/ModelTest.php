@@ -18,17 +18,17 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @todo expectedException MissingModelFieldException
+     * @PENDING expectedException MissingModelFieldException
      */
     public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnGetting() {
-        // $undefined = $this->users->undefined;
+        //$undefined = $this->users->undefined;
     }
     
     /**
-     * @todo expectedException MissingModelFieldException
+     * @PENDING expectedException MissingModelFieldException
      */
     public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnSetting() {
-        $this->users->undefined = 'Nothing';
+        //$this->users->undefined = 'Nothing';
     }
     
     public function testShouldReturnNullIfObjectIsEmpty() {
