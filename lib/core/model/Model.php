@@ -97,27 +97,21 @@ class Model extends Hookable {
     }
     public function schema() {
         if(empty($this->schema) && $this->table):
-            $this->schema = $this->describe();
+            // @todo move describe logic to the datasource
+            $db = $this->connection();
+            $this->schema = $db->describe($this->table);
+            if(is_null($this->primaryKey)):
+                foreach($schema as $field => $describe):
+                    if($describe['key'] == 'PRI'):
+                        $this->primaryKey = $field;
+                        break;
+                    endif;
+                endforeach;
+            endif;
+            
         endif;
         
         return $this->schema;
-    }
-    /**
-     * @todo refactor
-     */
-    protected function describe() {
-        $db = $this->connection();
-        $schema = $db->describe($this->table);
-        if(is_null($this->primaryKey)):
-            foreach($schema as $field => $describe):
-                if($describe['key'] == 'PRI'):
-                    $this->primaryKey = $field;
-                    break;
-                endif;
-            endforeach;
-        endif;
-        
-        return $schema;
     }
     public function loadModel($model) {
         return $this->{$model} = Model::load($model);
