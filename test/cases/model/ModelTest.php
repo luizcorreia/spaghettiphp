@@ -10,6 +10,13 @@ class ModelTest extends DatabaseTestCase {
         
         $this->Users = Model::load('Users');
     }
+
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testCallShouldThrowExceptionForMissingMethods() {
+        $this->Users->thisMethodDoesNotExist();
+    }
     
     /**
      * @PENDING expectedException MissingModelFieldException
