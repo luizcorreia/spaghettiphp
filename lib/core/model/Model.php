@@ -90,39 +90,22 @@ class Model extends Hookable {
     public function connection() {
         if(!$this->connected):
             $this->connected = true;
-            $this->setSource($this->table);
+            $this->schema();
         endif;
         
         return Connection::get($this->connection);
     }
-    /**
-     * @todo refactor
-     */
-    public function setSource($table) {
-        if($table):
-            $db = $this->connection();
-            $this->table = $table;
-            $sources = $db->listSources();
-            if(!in_array($this->table, $sources)):
-                throw new MissingTableException(array(
-                    'table' => $this->table
-                ));
-                return false;
-            endif;
-            if(empty($this->schema)):
-                $this->describe();
-            endif;
-        endif;
-        return true;
-    }
     public function schema() {
-        $this->connection();
+        if(empty($this->schema) && $this->table):
+            $this->schema = $this->describe();
+        endif;
+        
         return $this->schema;
     }
     /**
      * @todo refactor
      */
-    public function describe() {
+    protected function describe() {
         $db = $this->connection();
         $schema = $db->describe($this->table);
         if(is_null($this->primaryKey)):
@@ -134,7 +117,7 @@ class Model extends Hookable {
             endforeach;
         endif;
         
-        return $this->schema = $schema;
+        return $schema;
     }
     public function loadModel($model) {
         return $this->{$model} = Model::load($model);

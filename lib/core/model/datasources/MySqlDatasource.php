@@ -33,19 +33,26 @@ class MySqlDatasource extends PdoDatasource {
         return $this->sources;
     }
     public function describe($table) {
-        if(!isset($this->schema[$table])):
+        if(!array_key_exists($table, $this->schema)):
             $columns = $this->fetchAll('SHOW COLUMNS FROM ' . $table);
-            $schema = array();
-            foreach($columns as $column):
-                $schema[$column['Field']] = array(
-                    'type' => $this->column($column['Type']),
-                    'null' => $column['Null'] == 'YES' ? true : false,
-                    'default' => $column['Default'],
-                    'key' => $column['Key'],
-                    'extra' => $column['Extra']
-                );
-            endforeach;
-            $this->schema[$table] = $schema;
+            
+            if(!empty($columns)):
+                $schema = array();
+                foreach($columns as $column):
+                    $schema[$column['Field']] = array(
+                        'type' => $this->column($column['Type']),
+                        'null' => $column['Null'] == 'YES' ? true : false,
+                        'default' => $column['Default'],
+                        'key' => $column['Key'],
+                        'extra' => $column['Extra']
+                    );
+                endforeach;
+                $this->schema[$table] = $schema;
+            else:
+                throw new MissingTableException(array(
+                    'table' => $table
+                ));
+            endif;
         endif;
         
         return $this->schema[$table];
