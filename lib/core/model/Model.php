@@ -55,6 +55,7 @@ class Model extends Hookable {
             $this->data = array_intersect_key($data, $this->schema);
         endif;
     }
+    // @todo refactor
     public function __call($method, $args) {
         $regex = '/(?<method>first|all|get)(?:By)?(?<complement>[a-z]+)/i';
         if(preg_match($regex, $method, $output)):
@@ -149,14 +150,17 @@ class Model extends Hookable {
         foreach($this->associations as $type):
             $associations = array();
             $relationship = Inflector::camelize($type);
+            
             foreach($this->{$type} as $key => $properties):
                 if(is_array($properties)):
                     $properties['name'] = $key;
                 else:
                     $key = $properties;
                 endif;
+                
                 $associations[$key] = new $relationship($properties);
             endforeach;
+            
             $this->{$type} = $associations;
         endforeach;
     }
@@ -167,12 +171,14 @@ class Model extends Hookable {
                 $options = $behavior;
                 $behavior = $key;
             endif;
+            
             $this->loadBehavior($behavior, $options);
         endforeach;
     }
     protected function loadBehavior($behavior, $options = array()) {
         $behavior = Inflector::camelize($behavior);
         Behavior::load($behavior);
+        
         return $this->{$behavior} = new $behavior($this, $options);
     }
     public function query($query) {
@@ -191,14 +197,14 @@ class Model extends Hookable {
         return $this->connection()->rollback();
     }
     public function all($params = array()) {
-        $db = $this->connection();
         $params += array(
-            'table' => $this->table,
             'fields' => '*',
+            'table' => $this->table,
             'order' => $this->order,
             'limit' => $this->limit
         );
-        $results = $db->read($params);
+        $results = $this->connection()->read($params);
+
         return $results;
     }
     public function first($params = array()) {
@@ -210,23 +216,24 @@ class Model extends Hookable {
         return empty($results) ? array() : $results[0];
     }
     public function count($params = array()) {
-        $db = $this->connection();
         $params = array_merge($params, array(
-            'fields' => '*',
             'table' => $this->table,
             'limit' => null
         ));
-        return $db->count($params);
+
+        return $this->connection()->count($params);
     }
     public function paginate($params = array()) {
         $params += array(
             'perPage' => $this->perPage,
             'page' => 1
         );
-        $offset = ($page - 1) * $params['perPage'];
-        $params['offset'] = $offset;
+
+        $params['offset'] = ($page - 1) * $params['perPage'];
         $params['limit'] = $params['perPage'];
+
         $totalRecords = $this->count($params);
+
         $this->pagination = array(
             'totalRecords' => $totalRecords,
             'totalPages' => ceil($totalRecords / $params['perPage']),
@@ -238,16 +245,14 @@ class Model extends Hookable {
         return $this->all($params);
     }
     public function toList($params = array()) {
-        $db = $this->connection();
         $params += array(
             'key' => $this->primaryKey,
-            'displayField' => $this->displayField,
-            'table' => $this->table,
-            'order' => $this->order,
-            'limit' => $this->limit
+            'displayField' => $this->displayField
         );
         $params['fields'] = array($params['key'], $params['displayField']);
-        $all = $db->read($params);
+
+        $all = $this->connection()->read($params);
+
         $results = array();
         foreach($all as $result):
             $results[$result[$params['key']]] = $result[$params['displayField']];
@@ -394,27 +399,24 @@ class Model extends Hookable {
     }
     public function delete($id) {
         $params = array(
-            'conditions' => array(
-                $this->primaryKey => $id
-            ),
+            'conditions' => array($this->primaryKey => $id),
             'limit' => 1
         );
-        if($this->exists(array($this->primaryKey => $id)) && $this->deleteAll($params)):
-            if($dependent):
-                $this->deleteDependent($id);
-            endif;
-            return true;
+        
+        if($this->exists(array($this->primaryKey => $id))):
+            return $this->deleteAll($params);
         endif;
+        
         return false;
     }
     public function deleteAll($params = array()) {
-        $db = $this->connection();
         $params += array(
             'table' => $this->table,
             'order' => $this->order,
             'limit' => $this->limit
         );
-        return $db->delete($params);
+
+        return $this->connection()->delete($params);
     }
     public function getInsertId() {
         return $this->connection()->insertId();
@@ -450,7 +452,7 @@ class Model extends Hookable {
         $this->data[$field] = $value;
     }
     public function create($data = array()) {
-        $thisClass = get_class($this);
-        return new $thisClass($data);
+        $self = get_class($this);
+        return new $self($data);
     }
 }
