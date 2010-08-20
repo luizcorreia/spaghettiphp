@@ -3,7 +3,6 @@
 require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/test.php';
 require_once 'lib/helpers/FormHelper.php';
-require_once 'test/classes/models/Users.php';
 
 class FormHelperTest extends PHPUnit_Framework_TestCase {
     public function setUp() {

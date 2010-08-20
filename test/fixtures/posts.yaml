@@ -1,0 +1,12 @@
+1:
+    user_id: 1
+    title: My First Post
+    text: This is my first post
+2:
+    user_id: 1
+    title: My Second Post
+    text: This is my second post
+3:
+    user_id: 2
+    title: My Third Post
+    text: This is my third post

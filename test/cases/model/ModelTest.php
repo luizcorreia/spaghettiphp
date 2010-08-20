@@ -2,70 +2,58 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/config/test.php';
-require_once 'test/classes/models/Users.php';
+require_once 'test/classes/DatabaseTestCase.php';
 
-class ModelTest extends PHPUnit_Framework_TestCase {
-    public static function setUpBeforeClass() {
-        $connection = Connection::get('test');
-        $connection->query(Filesystem::read('test/sql/users_up.sql'));
-    }
-    public static function tearDownAfterClass() {
-        $connection = Connection::get('test');
-        $connection->query(Filesystem::read('test/sql/users_down.sql'));
-    }
+class ModelTest extends DatabaseTestCase {
     public function setUp() {
-        $this->users = new Users();
+        parent::setUp();
+        
+        $this->Users = Model::load('Users');
     }
     
     /**
      * @PENDING expectedException MissingModelFieldException
      */
     public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnGetting() {
-        //$undefined = $this->users->undefined;
+        //$undefined = $this->Users->undefined;
     }
     
     /**
      * @PENDING expectedException MissingModelFieldException
      */
     public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnSetting() {
-        //$this->users->undefined = 'Nothing';
+        //$this->Users->undefined = 'Nothing';
     }
     
     public function testShouldReturnNullIfObjectIsEmpty() {
-        $this->assertNull($this->users->username);
+        $user = $this->Users->create();
+        $this->assertNull($user->username);
     }
 
     /**
      * @testdox toList should return a key/value array
-     * @todo refactor this test, maybe use fixtures?
      */
     public function testToListShouldReturnAKeyValueArray() {
-        $data = array(
-            "username" => "spaghettiphp",
-            "password" => 123456
-        );
-        $this->users->save($data);
-
         $params = array(
-            "key" => "username",
-            "displayField" => "password"
+            'key' => 'username',
+            'displayField' => 'password'
         );
-        $actual = $this->users->toList($params);
+        $actual = $this->Users->toList($params);
         
         $expected = array(
-            "spaghettiphp" => 123456
+            'spaghettiphp' => 123456
         );
         $this->assertEquals($expected, $actual);
     }
 
     public function testCreateMethodReturnSelfClassObject() {
-        $expected = get_class($this->users);
-        $actual = get_class($this->users->create());
+        $expected = get_class($this->Users);
+        $actual = get_class($this->Users->create());
         $this->assertEquals($expected, $actual);
     }
     
     public function testSaveMethodSetTheFieldsOnInserting() {
-        $user = $this->users->create();
+        $user = $this->Users->create();
         $user->username = 'username';
         $user->password = 'password';
         $user->save();
@@ -78,7 +66,7 @@ class ModelTest extends PHPUnit_Framework_TestCase {
     }
     
     public function testSaveMethodSetTheFieldsOnUpdate() {
-        $user = $this->users->create();
+        $user = $this->Users->create();
         $user->username = 'username2';
         $user->password = 'password2';
         $user->save();
