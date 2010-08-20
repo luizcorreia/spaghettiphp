@@ -31,6 +31,7 @@ class Model extends Hookable {
     protected $errors = array();
 
     protected $connection = 'default';
+    protected $connected = false;
 
     protected $data = array();
 
@@ -41,14 +42,12 @@ class Model extends Hookable {
             $this->connection = Config::read('App.environment');
         endif;
         
-       if(is_null($this->table)):
-            $database = Connection::getConfig($this->connection);
-            $this->table = $database['prefix'] . Inflector::underscore(get_class($this));
+        if(is_null($this->table)):
+            $this->table = Inflector::underscore(get_class($this));
         endif;
+        $database = Connection::getConfig($this->connection);
+        $this->table = $database['prefix'] . $this->table;
         
-        // @todo move to the first query
-        $this->setSource($this->table);
-
         $this->loadBehaviors($this->behaviors);
         
         if(!empty($data)):
@@ -92,7 +91,6 @@ class Model extends Hookable {
             endif;
             if(class_exists($name)):
                 Model::$instances[$name] = new $name();
-                // @todo remove this
                 Model::$instances[$name]->createRelations();
             else:
                 throw new MissingModelException(array(
@@ -104,6 +102,11 @@ class Model extends Hookable {
         return Model::$instances[$name];
     }
     public function connection() {
+        if(!$this->connected):
+            $this->connected = true;
+            $this->setSource($this->table);
+        endif;
+        
         return Connection::get($this->connection);
     }
     /**
@@ -125,6 +128,10 @@ class Model extends Hookable {
             endif;
         endif;
         return true;
+    }
+    public function schema() {
+        $this->connection();
+        return $this->schema;
     }
     /**
      * @todo refactor
@@ -292,7 +299,7 @@ class Model extends Hookable {
     /**
      * @todo refactor
      */
-    public function save($data = array()) {        
+    public function save($data = array()) {
         if(empty($data)):
             $data = $this->data;
         endif;
@@ -303,6 +310,7 @@ class Model extends Hookable {
             $data['modified'] = $date;
         endif;
 
+        $db = $this->connection(); // yes, this is a hack
         // verify if the record exists
         $exists = $this->exists(array(
             $this->primaryKey => $this->id
