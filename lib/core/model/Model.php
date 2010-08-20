@@ -97,18 +97,11 @@ class Model extends Hookable {
     }
     public function schema() {
         if(empty($this->schema) && $this->table):
-            // @todo move describe logic to the datasource
             $db = $this->connection();
             $this->schema = $db->describe($this->table);
             if(is_null($this->primaryKey)):
-                foreach($schema as $field => $describe):
-                    if($describe['key'] == 'PRI'):
-                        $this->primaryKey = $field;
-                        break;
-                    endif;
-                endforeach;
+                $this->primaryKey = $db->primaryKeyFor($this->table);
             endif;
-            
         endif;
         
         return $this->schema;

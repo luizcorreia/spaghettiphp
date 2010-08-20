@@ -57,6 +57,13 @@ class MySqlDatasource extends PdoDatasource {
         
         return $this->schema[$table];
     }
+    public function primaryKeyFor($table) {
+        foreach($this->schema[$table] as $field => $describe):
+            if($describe['key'] == 'PRI'):
+                return $field;
+            endif;
+        endforeach;
+    }
     protected function column($column) {
         preg_match('/([a-z]*)\(?([^\)]*)?\)?/', $column, $type);
         list($column, $type, $limit) = $type;
