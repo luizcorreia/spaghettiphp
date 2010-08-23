@@ -192,7 +192,7 @@ class Model extends Hookable {
             'page' => 1
         );
 
-        $params['offset'] = ($page - 1) * $params['perPage'];
+        $params['offset'] = ($params['page'] - 1) * $params['perPage'];
         $params['limit'] = $params['perPage'];
 
         $totalRecords = $this->count($params);
