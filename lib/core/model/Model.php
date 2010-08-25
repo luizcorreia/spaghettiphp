@@ -182,6 +182,7 @@ class Model extends Hookable {
     public function count($params = array()) {
         $params = array_merge($params, array(
             'table' => $this->table,
+            'offset' => null,
             'limit' => null
         ));
 
