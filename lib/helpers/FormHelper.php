@@ -116,10 +116,6 @@ class FormHelper extends Helper {
         );
         $attr = $this->attributes($name, $attr, $defaults);
         
-        if($this->model() && $this->model()->hasError($name)):
-            $attr['class'] = 'error';
-        endif;
-        
         return $this->html->tag('input', null, $attr);
     }
     protected function model() {
@@ -161,6 +157,10 @@ class FormHelper extends Helper {
             'id' => $this->id($name),
             'name' => $this->name($name)
         );
+
+        if($this->model() && $this->model()->hasError($name)):
+            $attr['class'] = 'error';
+        endif;
         
         return array_merge($field_defaults, $defaults, $attr);
     }
