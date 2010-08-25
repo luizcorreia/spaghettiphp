@@ -39,6 +39,15 @@ class HtmlHelper extends Helper {
         
         return join(' ', $attributes);
     }
+    public function addClass($attr, $class) {
+        if(array_key_exists('class', $attr)):
+            $attr['class'] .= ' ' . $class;
+        else:
+            $attr['class'] = $class;
+        endif;
+        
+        return $attr;
+    }
     public function link($text, $url = null, $attr = array(), $full = false) {
         if(is_null($url)):
             $url = $text;

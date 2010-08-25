@@ -385,4 +385,42 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $actual);
     }
     
+    /**
+     * @testdox textarea should add class="error" if field failed validation
+     */
+    public function testTextareaShouldAddClassErrorIfFieldFailedValidation() {
+        $expected = '<textarea id="users_username" name="users[username]" class="error"></textarea>';
+        $user = new Users();
+        $user->validate();
+        $this->form->create($user);
+        $actual = $this->form->textarea('username');
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox select should add class="error" if field failed validation
+     */
+    public function testSelectShouldAddClassErrorIfFieldFailedValidation() {
+        $expected  = '<select id="users_username" name="users[username]" class="error"></select>';
+        $user = new Users();
+        $user->validate();
+        $this->form->create($user);
+        $actual = $this->form->select('username');
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @testdox text with class should not overwrite with class="error" when validation fails
+     */
+    public function testTextWithClassShouldNotOverwriteWithClassErrorWhenValidationFails() {
+        $expected = '<input id="users_username" name="users[username]" type="text" class="text error" />';
+        $user = new Users();
+        $user->validate();
+        $this->form->create($user);
+        $actual = $this->form->text('username', array('class' => 'text'));
+        
+        $this->assertEquals($expected, $actual);
+    }
 }

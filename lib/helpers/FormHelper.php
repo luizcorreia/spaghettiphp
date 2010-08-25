@@ -159,7 +159,7 @@ class FormHelper extends Helper {
         );
 
         if($this->model() && $this->model()->hasError($name)):
-            $attr['class'] = 'error';
+            $attr = $this->html->addClass($attr, 'error');
         endif;
         
         return array_merge($field_defaults, $defaults, $attr);
