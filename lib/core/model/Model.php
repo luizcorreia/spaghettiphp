@@ -315,7 +315,10 @@ class Model extends Hookable {
     /**
      * @todo refactor
      */
-    public function validate($data) {
+    public function validate($data = null) {
+        if(is_null($data)):
+            $data = $this->data;
+        endif;
         $this->errors = array();
         $defaults = array(
             'required' => false,
