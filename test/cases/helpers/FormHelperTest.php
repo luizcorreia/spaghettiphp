@@ -99,7 +99,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox text should return a input with type=text
      */
     public function testTextShouldReturnAInputWithTypeText() {
-        $expected = '<input value="spaghettiphp" type="text" id="users_username" name="users[username]" />';
+        $expected = '<input value="spaghettiphp" id="users_username" name="users[username]" type="text" />';
         $this->form->create('users');
         $actual = $this->form->text('username', array('value' => 'spaghettiphp'));
         
@@ -110,7 +110,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox textarea should return a textarea
      */
     public function testTextareaShouldReturnATextarea() {
-        $expected = '<textarea class="text" id="users_description" name="users[description]"></textarea>';
+        $expected = '<textarea id="users_description" name="users[description]" class="text"></textarea>';
         $this->form->create('users');
         $actual = $this->form->textarea('description', array('class' => 'text'));
         
@@ -132,7 +132,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox password should return a input with type=password
      */
     public function testPasswordShouldReturnAInputWithTypePassword() {
-        $expected = '<input value="123456" type="password" id="users_password" name="users[password]" />';
+        $expected = '<input value="123456" id="users_password" name="users[password]" type="password" />';
         $this->form->create('users');
         $actual = $this->form->password('password', array('value' => '123456'));
         
@@ -143,7 +143,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox hidden should return a input with type=hidden
      */
     public function testHiddenShouldReturnAInputWithTypeHidden() {
-        $expected = '<input value="123456" type="hidden" id="users_hidden" name="users[hidden]" />';
+        $expected = '<input value="123456" id="users_hidden" name="users[hidden]" type="hidden" />';
         $this->form->create('users');
         $actual = $this->form->hidden('hidden', array('value' => '123456'));
         
@@ -154,7 +154,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox file should return a input with type=file
      */
     public function testFileShouldReturnAInputWithTypeFile() {
-        $expected = '<input class="user-avatar" type="file" id="users_avatar" name="users[avatar]" />';
+        $expected = '<input id="users_avatar" name="users[avatar]" type="file" class="user-avatar" />';
         $this->form->create('users');
         $actual = $this->form->file('avatar', array('class' => 'user-avatar'));
         
@@ -165,8 +165,8 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox checkbox should return a input with type=checkbox and another with type=hidden
      */
     public function testCheckboxShouldReturnAInputWithTypeCheckbox() {
-        $expected  = '<input value="0" type="hidden" name="users[newsletter]" />';
-        $expected .= '<input value="1" type="checkbox" id="users_newsletter" name="users[newsletter]" />';
+        $expected  = '<input value="0" name="users[newsletter]" type="hidden" />';
+        $expected .= '<input value="1" id="users_newsletter" name="users[newsletter]" type="checkbox" />';
         $this->form->create('users');
         $actual = $this->form->checkbox('newsletter');
         
@@ -177,7 +177,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox radio should return a input with type=radio
      */
     public function testRadioShouldReturnAInputWithTypeRadio() {
-        $expected = '<input value="yes" id="users_newsletter_yes" type="radio" name="users[newsletter]" />';
+        $expected = '<input value="yes" id="users_newsletter_yes" name="users[newsletter]" type="radio" />';
         $this->form->create('users');
         $actual = $this->form->radio('newsletter', 'yes');
         
@@ -318,7 +318,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox text should add model value to input
      */
     public function testTextShouldAddModelValueToInput() {
-        $expected = '<input value="spaghettiphp" type="text" id="users_username" name="users[username]" />';
+        $expected = '<input value="spaghettiphp" id="users_username" name="users[username]" type="text" />';
         $user = new Users();
         $user->username = 'spaghettiphp';
         $this->form->create($user);
@@ -363,7 +363,7 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
      * @testdox radio should add model value to input
      */
     public function testRadioShouldAddModelValueToInput() {
-        $expected = '<input value="yes" id="users_newsletter_yes" checked="checked" type="radio" name="users[newsletter]" />';
+        $expected = '<input value="yes" id="users_newsletter_yes" name="users[newsletter]" type="radio" checked="checked" />';
         $user = new Users();
         $user->newsletter = 'yes';
         $this->form->create($user);

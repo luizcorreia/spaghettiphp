@@ -38,11 +38,7 @@ class FormHelper extends Helper {
         return $this->input($name, 'text', $attr);
     }
     public function textarea($name, $attr = array()) {
-        $attr += array(
-            'id' => $this->id($name),
-            'name' => $this->name($name),
-            'value' => $this->value($name)
-        );
+        $attr = $this->attributes($name, $attr);
         
         return $this->html->tag('textarea', array_unset($attr, 'value'), $attr);
     }
@@ -78,11 +74,7 @@ class FormHelper extends Helper {
         return $this->input($name, 'radio', $attr);
     }
     public function select($name, $options = array(), $attr = array()) {
-        $attr += array(
-            'id' => $this->id($name),
-            'name' => $this->name($name),
-            'value' => $this->value($name)
-        );
+        $attr = $this->attributes($name, $attr);
         
         if(array_key_exists('empty', $attr)):
             $options = $this->addEmptyOption($options, array_unset($attr, 'empty'));
@@ -119,12 +111,10 @@ class FormHelper extends Helper {
         return $this->html->tag('button', $value, $attr);
     }
     protected function input($name, $type, $attr) {
-        $attr += array(
-            'value' => $this->value($name),
-            'type' => $type,
-            'id' => $this->id($name),
-            'name' => $this->name($name)
+        $defaults = array(
+            'type' => $type
         );
+        $attr = $this->attributes($name, $attr, $defaults);
         
         
         return $this->html->tag('input', null, $attr);
@@ -161,6 +151,15 @@ class FormHelper extends Helper {
         endif;
         
         return false;
+    }
+    protected function attributes($name, $attr, $defaults = array()) {
+        $field_defaults = array(
+            'value' => $this->value($name),
+            'id' => $this->id($name),
+            'name' => $this->name($name)
+        );
+        
+        return array_merge($field_defaults, $defaults, $attr);
     }
     protected function options($options, $selected) {
         $content = '';
