@@ -371,4 +371,18 @@ class FormHelperTest extends PHPUnit_Framework_TestCase {
         
         $this->assertEquals($expected, $actual);
     }
+    
+    /**
+     * @testdox text should add class="error" if field failed validation
+     */
+    public function testTextShouldAddClassErrorIfFieldFailedValidation() {
+        $expected = '<input id="users_username" name="users[username]" type="text" class="error" />';
+        $user = new Users();
+        $user->validate();
+        $this->form->create($user);
+        $actual = $this->form->text('username');
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
 }

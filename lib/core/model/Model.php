@@ -368,6 +368,9 @@ class Model extends Hookable {
             endif;
         endif;
     }
+    public function hasError($field) {
+        return array_key_exists($field, $this->errors);
+    }
     public function delete($id) {
         $params = array(
             'conditions' => array($this->primaryKey => $id),

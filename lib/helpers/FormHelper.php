@@ -116,6 +116,9 @@ class FormHelper extends Helper {
         );
         $attr = $this->attributes($name, $attr, $defaults);
         
+        if($this->model() && $this->model()->hasError($name)):
+            $attr['class'] = 'error';
+        endif;
         
         return $this->html->tag('input', null, $attr);
     }
