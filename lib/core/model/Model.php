@@ -83,7 +83,7 @@ class Model extends Hookable {
             return $this->$output['method']($params);
         endif;
 
-        throw new BadMethodCallException('Model::' . $method . ' does not exist.');
+        throw new BadMethodCallException(get_class($this) . '::' . $method . ' does not exist.');
     }
     public static function load($name) {
         if(!array_key_exists($name, Model::$instances)):
