@@ -1,223 +1,194 @@
 <?php
 
 class FormHelper extends Helper {
-    public function create($action = null, $options = array()) {
-        $options += array(
-            'method' => 'post',
-            'action' => Mapper::url($action)
+    protected $stack = array();
+    
+    public function create($object, $action = null, $attr = array()) {
+        array_push($this->stack, $object);
+        
+        $attr += array(
+            'action' => Mapper::url($action),
+            'method' => 'post'
         );
         
-        if($options['method'] == 'file'):
-            $options['method'] = 'post';
-            $options['enctype'] = 'multipart/form-data';
+        if($attr['method'] == 'file'):
+            $attr['method'] = 'post';
+            $attr['enctype'] = 'multipart/form-data';
         endif;
         
-        return $this->html->openTag('form', $options);
+        return $this->html->openTag('form', $attr);
     }
-    public function close($submit = null, $attributes = array()) {
-        $form = $this->html->closeTag('form');
-
-        if(!is_null($submit)):
-            $form = $this->submit($submit, $attributes) . $form;
+    public function close() {
+        array_pop($this->stack);
+        
+        return $this->html->closeTag('form');
+    }
+    public function label($name, $text = null, $attr = array()) {
+        $attr += array(
+            'for' => $this->id($name)
+        );
+        
+        if(is_null($text)):
+            $text = Inflector::humanize($name);
         endif;
-
-        return $form;
+        
+        return $this->html->tag('label', $text, $attr);
     }
-    public function submit($text, $attributes = array()) {
-        $attributes += array(
+    public function text($name, $attr = array()) {
+        return $this->input($name, 'text', $attr);
+    }
+    public function textarea($name, $attr = array()) {
+        $attr = $this->attributes($name, $attr);
+        
+        return $this->html->tag('textarea', array_unset($attr, 'value'), $attr);
+    }
+    public function password($name, $attr = array()) {
+        return $this->input($name, 'password', $attr);
+    }
+    public function hidden($name, $attr = array()) {
+        return $this->input($name, 'hidden', $attr);
+    }
+    public function file($name, $attr = array()) {
+        return $this->input($name, 'file', $attr);
+    }
+    public function checkbox($name, $attr = array()) {
+        $attr += array(
+            'value' => 1
+        );
+
+        $hidden = $this->hidden($name, array(
+            'id' => false,
+            'value' => 0
+        ));
+        $checkbox = $this->input($name, 'checkbox', $attr);
+        
+        return $hidden . $checkbox;
+    }
+    public function radio($name, $value, $attr = array()) {
+        $attr += array(
+            'value' => $value,
+            'id' => $this->id($name) . '_' . Inflector::underscore($value),
+            'checked' => $value == $this->value($name)
+        );
+        
+        return $this->input($name, 'radio', $attr);
+    }
+    public function select($name, $options = array(), $attr = array()) {
+        $attr = $this->attributes($name, $attr);
+        
+        if(array_key_exists('empty', $attr)):
+            $options = $this->addEmptyOption($options, array_unset($attr, 'empty'));
+        endif;
+        
+        $options = $this->options($options, array_unset($attr, 'value'));
+        
+        return $this->html->tag('select', $options, $attr);
+    }
+    public function submit($value, $attr = array()) {
+        $attr += array(
+            'name' => 'commit',
             'type' => 'submit',
-            'tag' => 'button'
+            'value' => $value
         );
-        switch(array_unset($attributes, 'tag')):
-            case 'image':
-                $attributes['alt'] = $text;
-                $attributes['type'] = 'image';
-                $attributes['src'] = $this->assets->image($attributes['src']);
-            case 'input':
-                $attributes['value'] = $text;
-                return $this->html->tag('input', '', $attributes, true);
-            default:
-                return $this->html->tag('button', $text, $attributes);
-        endswitch;
+        
+        return $this->html->tag('input', null, $attr);
     }
-    public function select($name, $options = array()) {
-        $options += array(
-            'name' => $name,
-            'options' => array(),
-            'value' => null,
-            'empty' => false
+    public function imagesubmit($value, $attr = array()) {
+        $attr += array(
+            'name' => 'commit',
+            'type' => 'image',
+            'src' => $this->assets->image($value)
         );
         
-        $select_options = array_unset($options, 'options');
-        $select_value = array_unset($options, 'value');
+        return $this->html->tag('input', null, $attr);
+    }
+    public function button($value, $type = 'submit', $attr = array()) {
+        $attr += array(
+            'name' => 'commit',
+            'type' => $type
+        );
         
-        if(($empty = array_unset($options, 'empty')) !== false):
-            $keys = array_keys($select_options);
-            if(is_array($empty)):
-                $empty_keys = array_keys($empty);
-                $key = $empty_keys[0];
-                $values = array_merge($empty, $select_options);
-            else:
-                $key = $empty;
-                $values = array_merge(array($empty), $select_options);
-            endif;
-            array_unshift($keys, $key);
-            $select_options = array_combine($keys, $values);
+        return $this->html->tag('button', $value, $attr);
+    }
+    protected function input($name, $type, $attr) {
+        $defaults = array(
+            'type' => $type
+        );
+        $attr = $this->attributes($name, $attr, $defaults);
+        
+        return $this->html->tag('input', null, $attr);
+    }
+    protected function model() {
+        $object = end($this->stack);
+        
+        if(is_object($object)):
+            return $object;
         endif;
         
-        $content = '';
-        foreach($select_options as $key => $value):
-            $option = array('value' => $key);
-            if((string) $key === (string) $select_value):
-                $option['selected'] = true;
+        return false;
+    }
+    public function modelname() {
+        $object = end($this->stack);
+        
+        if(is_object($object)):
+            $object = get_class($object);
+        endif;
+        
+        return Inflector::underscore($object);
+    }
+    protected function id($id) {
+        return $this->modelname() . '_' . $id;
+    }
+    protected function name($name) {
+        return $this->modelname() . '[' . $name . ']';
+    }
+    protected function value($name) {
+        if($model = $this->model()):
+            if(!is_null($model->{$name})):
+                return $model->{$name};
             endif;
-            $content .= $this->html->tag('option', $value, $option);
+        endif;
+        
+        return false;
+    }
+    protected function attributes($name, $attr, $defaults = array()) {
+        $field_defaults = array(
+            'value' => $this->value($name),
+            'id' => $this->id($name),
+            'name' => $this->name($name)
+        );
+
+        if($this->model() && $this->model()->hasError($name)):
+            $attr = $this->html->addClass($attr, 'error');
+        endif;
+        
+        return array_merge($field_defaults, $defaults, $attr);
+    }
+    protected function options($options, $selected) {
+        $content = '';
+        foreach($options as $value => $text):
+            $attr = compact('value');
+            
+            if($value === $selected):
+                $attr['selected'] = true;
+            endif;
+            
+            $content .= $this->html->tag('option', $text, $attr);
         endforeach;
         
-        return $this->html->tag('select', $content, $options);
+        return $content;
     }
-    public function radio($name, $options = array()) {
-        $options += array(
-            'options' => array(),
-            'value' => null,
-            'legend' => Inflector::camelize($name)
-        );
-        $radio_options = array_unset($options, 'options');
-        $radio_value = array_unset($options, 'value');
-        if($legend = array_unset($options, 'legend')):
-            $content = $this->html->tag('legend', $legend);
-        endif;
-        
-        $content = '';
-        foreach($radio_options as $key => $value):
-            $radio_attr = array(
-                'type' => 'radio',
-                'value' => $key,
-                'id' => Inflector::camelize($name . '_' . $key),
-                'name' => $name
-            );
-            if((string) $key === (string) $radio_value):
-                $radio_attr['checked'] = true;
+    protected function addEmptyOption($options, $empty) {
+        if(is_array($empty)):
+            $options = $empty + $options;
+        else:
+            if($empty === true):
+                $empty = '';
             endif;
-            $for = array('for' => $radio_attr['id']);
-            $content .= $this->html->tag('input', '', $radio_attr, true);
-            $content .= $this->html->tag('label', $value, $for);
-        endforeach;
         
-        return $this->html->tag('fieldset', $content);
-    }
-    public function date($name, $options = array()) {
-        if(is_array($options['value'])):
-            $date = mktime(0, 0, 0, $v['m'], $v['d'], $v['y']);
-        elseif(!is_null($options['value'])):
-            $date = strtotime($options['value']);
-        else:
-            $date = time();
-        endif;
-
-        $options += array(
-            'value' => null,
-            'startYear' => 1980,
-            'endYear' => date('Y'),
-            'currentDay' => date('j', $date),
-            'currentMonth' => date('n', $date),
-            'currentYear' => date('Y', $date),
-            'format' => 'dmy'
-        );
-
-        $days = array_range(1, 31);
-        $months = array_range(1, 12);
-        $years = array_range($options['startYear'], $options['endYear']);
-        
-        $select_day = $this->select($name . '[d]', array(
-            'value' => $options['currentDay'],
-            'options' => $days,
-            'id' => $options['id'] . 'D'
-        ));
-        
-        $select_month = $this->select($name . '[m]', array(
-            'value' => $options['currentMonth'],
-            'options' => $months,
-            'id' => $options['id'] . 'M'
-        ));
-        
-        $select_year = $this->select($name . '[y]', array(
-            'value' => $options['currentYear'],
-            'options' => $years,
-            'id' => $options['id'] . 'Y'
-        ));
-        
-        if($format == 'ymd'):
-            return $select_year . $select_month . $select_day;
-        else:
-            return $select_day . $select_month . $select_year;
-        endif;
-    }
-    public function input($name, $options = array()) {
-        $options += array(
-            'name' => $name,
-            'type' => 'text',
-            'id' => 'Form' . Inflector::camelize($name),
-            'label' => Inflector::humanize($name),
-            'div' => true,
-            'value' => ''
-        );
-        
-        $label = array_unset($options, 'label');
-        $div = array_unset($options, 'div');
-        $type = $options['type'];
-
-        switch($options['type']):
-            case 'select':
-                unset($options['type']);
-                $input = $this->select($name, $options);
-                break;
-            case 'radio':
-                $options['legend'] = $label;
-                $label = false;
-                $input = $this->radio($name, $options);
-                break;
-            case 'date':
-                $input = $this->date($name, $options);
-                $options['id'] = $options['id'] . 'D';
-                break;
-            case 'textarea':
-                unset($options['type']);
-                $value = Sanitize::html(array_unset($options, 'value'));
-                $input = $this->html->tag('textarea', $value, $options);
-                break;
-            case 'hidden':
-                $div = $label = false;
-            default:
-                if($name == 'password'):
-                    $options['type'] = 'password';
-                endif;
-                $options['value'] = Sanitize::html($options['value']);
-                $input = $this->html->tag('input', '', $options, true);
-        endswitch;
-
-        if($label):
-            $for = array('for' => $options['id']);
-            $input = $this->html->tag('label', $label, $for) . $input;
-        endif;
-
-        if($div):
-            $input = $this->div($div, $input, $type);
-        endif;
-
-        return $input;
-    }
-    protected function div($class, $content, $type) {
-        $attr = array(
-            'class' => 'input ' . $type
-        );
-        
-        if(is_array($class)):
-            $attr = $class + $attr;
-        elseif(is_string($class)):
-            $attr['class'] .= ' ' . $class;
+            array_unshift($options, $empty);
         endif;
         
-        return $this->html->tag('div', $content, $attr);
+        return $options;
     }
 }

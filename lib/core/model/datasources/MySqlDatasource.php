@@ -33,22 +33,36 @@ class MySqlDatasource extends PdoDatasource {
         return $this->sources;
     }
     public function describe($table) {
-        if(!isset($this->schema[$table])):
+        if(!array_key_exists($table, $this->schema)):
             $columns = $this->fetchAll('SHOW COLUMNS FROM ' . $table);
-            $schema = array();
-            foreach($columns as $column):
-                $schema[$column['Field']] = array(
-                    'type' => $this->column($column['Type']),
-                    'null' => $column['Null'] == 'YES' ? true : false,
-                    'default' => $column['Default'],
-                    'key' => $column['Key'],
-                    'extra' => $column['Extra']
-                );
-            endforeach;
-            $this->schema[$table] = $schema;
+            
+            if(!empty($columns)):
+                $schema = array();
+                foreach($columns as $column):
+                    $schema[$column['Field']] = array(
+                        'type' => $this->column($column['Type']),
+                        'null' => $column['Null'] == 'YES' ? true : false,
+                        'default' => $column['Default'],
+                        'key' => $column['Key'],
+                        'extra' => $column['Extra']
+                    );
+                endforeach;
+                $this->schema[$table] = $schema;
+            else:
+                throw new MissingTableException(array(
+                    'table' => $table
+                ));
+            endif;
         endif;
         
         return $this->schema[$table];
+    }
+    public function primaryKeyFor($table) {
+        foreach($this->schema[$table] as $field => $describe):
+            if($describe['key'] == 'PRI'):
+                return $field;
+            endif;
+        endforeach;
     }
     protected function column($column) {
         preg_match('/([a-z]*)\(?([^\)]*)?\)?/', $column, $type);
@@ -79,9 +93,19 @@ class MySqlDatasource extends PdoDatasource {
         return $limit;
     }
     public function count($params) {
+        $fields = '*';
+        if(array_key_exists('fields', $params)):
+            $fields = $params['fields'];
+            
+            if(is_array($params['fields'])):
+                $fields = $fields[0];
+            endif;
+        endif;
+        
         $params['fields'] = array(
-            'count' => 'COUNT(' . $this->alias($params['fields']) . ')'
+            'count' => 'COUNT(' . $fields . ')'
         );
+        
         $results = $this->read($params);
         
         return $results[0]['count'];

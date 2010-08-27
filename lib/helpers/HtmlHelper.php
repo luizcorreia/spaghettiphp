@@ -3,11 +3,7 @@
 class HtmlHelper extends Helper {
     public $scriptsForLayout = '';
     public $stylesForLayout = '';
-    protected $view;
-    
-    public function __construct($view) {
-        parent::__construct($view);
-    }
+
     public function openTag($tag, $attr = array(), $empty = false) {
         $html = '<' . $tag;
         $attr = $this->attr($attr);
@@ -21,26 +17,36 @@ class HtmlHelper extends Helper {
     public function closeTag($tag) {
         return '</' . $tag . '>';
     }
-    public function tag($tag, $content = '', $attr = array(), $empty = false) {
-        $html = $this->openTag($tag, $attr, $empty);
-        if(!$empty):
-            $html .= $content . $this->closeTag($tag);
+    public function tag($tag, $content = null, $attr = array()) {
+        if(is_null($content)):
+            return $this->openTag($tag, $attr, true);
+        else:
+            return $this->openTag($tag, $attr) . $content . $this->closeTag($tag);
         endif;
-        
-        return $html;
     }
-    public function attr($attr) {
+    protected function attr($attr) {
         $attributes = array();
+        
         foreach($attr as $name => $value):
             if($value === true):
                 $value = $name;
             elseif($value === false):
                 continue;
             endif;
+            
             $attributes []= $name . '="' . $value . '"';
         endforeach;
         
         return join(' ', $attributes);
+    }
+    public function addClass($attr, $class) {
+        if(array_key_exists('class', $attr)):
+            $attr['class'] .= ' ' . $class;
+        else:
+            $attr['class'] = $class;
+        endif;
+        
+        return $attr;
     }
     public function link($text, $url = null, $attr = array(), $full = false) {
         if(is_null($url)):
