@@ -12,6 +12,7 @@ class ModelTest extends DatabaseTestCase {
     }
 
     /**
+     * @testdox __call should throw exception for missing methods
      * @expectedException BadMethodCallException
      */
     public function testCallShouldThrowExceptionForMissingMethods() {
@@ -23,13 +24,6 @@ class ModelTest extends DatabaseTestCase {
      */
     public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnGetting() {
         //$undefined = $this->Users->undefined;
-    }
-    
-    /**
-     * @PENDING expectedException MissingModelFieldException
-     */
-    public function testShouldThrowExceptionWhenFieldNotFoundInSchemaOnSetting() {
-        //$this->Users->undefined = 'Nothing';
     }
     
     public function testShouldReturnNullIfObjectIsEmpty() {
