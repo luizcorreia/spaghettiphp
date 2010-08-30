@@ -70,7 +70,7 @@ class Model extends Hookable {
         endif;
     }
     public function __call($method, $args) {
-        $regex = '/(?<method>first|all)By(?<fields>[\w]+)/';
+        $regex = '/(?P<method>first|all)By(?P<fields>[\w]+)/';
         if(preg_match($regex, $method, $output)):
             $fields = Inflector::underscore($output['fields']);
             $fields = explode('_and_', $fields);

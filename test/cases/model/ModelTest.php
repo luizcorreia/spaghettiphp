@@ -18,6 +18,22 @@ class ModelTest extends DatabaseTestCase {
     public function testCallShouldThrowExceptionForMissingMethods() {
         $this->Users->thisMethodDoesNotExist();
     }
+
+    /**
+     * @testdox __call should return values to firstBy<field>
+     */
+    public function testCallShouldReturnValuesToFirstByField() {
+        $actual = $this->Users->firstById(1);
+        $this->assertType('array', $actual);
+    }
+
+    /**
+     * @testdox __call should return values to allBy<field>
+     */
+    public function testCallShouldReturnValuesToAllByField() {
+        $actual = $this->Users->allById(1);
+        $this->assertType('array', $actual);
+    }
     
     /**
      * @testdox __get should return null if value is not set
