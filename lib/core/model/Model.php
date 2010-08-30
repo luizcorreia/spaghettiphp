@@ -16,8 +16,10 @@ class Model extends Hookable {
     protected $hasAndBelongsToMany = array();
     protected $hasMany = array();
     protected $hasOne = array();
+    protected $__relationships = array();
 
     protected $behaviors = array();
+    protected $__behaviors = array();
 
     protected $displayField;
 
@@ -49,24 +51,29 @@ class Model extends Hookable {
 
     protected static $instances = array();
 
-    public function __construct() {
-        $this->initialize();
+    public function __construct($data = null, $new_record = true) {
+        $this->initialize($data, $new_record);
     }
-    protected function initialize() {
-        if(is_null($this->connection)):
-            $this->connection = Config::read('App.environment');
-        endif;
-        
-        if(is_null($this->table)):
-            $this->table = Inflector::underscore(get_class($this));
-        endif;
-        $database = Connection::getConfig($this->connection);
-        $this->table = $database['prefix'] . $this->table;
-        
-        $this->loadBehaviors($this->behaviors);
-        
+    protected function initialize($data, $new_record) {
+        $this->connection();
         if(!empty($data)):
             $this->data = array_intersect_key($data, $this->schema);
+        endif;
+    }
+    public function __get($field) {
+        if(array_key_exists($field, $this->__behaviors)):
+            return $this->__behaviors[$field];
+        elseif(array_key_exists($field, $this->schema())):
+            return array_key_exists($field, $this->data) ? $this->data[$field] : null;
+        else:
+            throw new RuntimeException(get_class($this) . '::$' . $field . ' does not exist.');
+        endif;
+    }
+    public function __set($field, $value) {
+        if(array_key_exists($field, $this->schema())):
+            $this->data[$field] = $value;
+        else:
+            $this->{$field} = $value;
         endif;
     }
     public function __call($method, $args) {
@@ -106,6 +113,19 @@ class Model extends Hookable {
     public function connection() {
         if(!$this->connected):
             $this->connected = true;
+
+            if(is_null($this->connection)):
+                $this->connection = Config::read('App.environment');
+            endif;
+            
+            if(is_null($this->table)):
+                $this->table = Inflector::underscore(get_class($this));
+            endif;
+            $database = Connection::getConfig($this->connection);
+            $this->table = $database['prefix'] . $this->table;
+            
+            $this->loadBehaviors($this->behaviors);
+
             $this->schema();
         endif;
         
@@ -122,12 +142,8 @@ class Model extends Hookable {
 
         return $this->schema;
     }
-    public function loadModel($model) {
-        return $this->{$model} = Model::load($model);
-    }
     public function createRelations() {
         foreach($this->associations as $type):
-            $associations = array();
             $relationship = Inflector::camelize($type);
             
             foreach($this->{$type} as $key => $properties):
@@ -137,10 +153,8 @@ class Model extends Hookable {
                     $key = $properties;
                 endif;
                 
-                $associations[$key] = new $relationship($properties);
+                $this->__relationships[$key] = new $relationship($properties);
             endforeach;
-            
-            $this->{$type} = $associations;
         endforeach;
     }
     protected function loadBehaviors($behaviors) {
@@ -158,7 +172,7 @@ class Model extends Hookable {
         $behavior = Inflector::camelize($behavior);
         Behavior::load($behavior);
         
-        return $this->{$behavior} = new $behavior($this, $options);
+        return $this->__behaviors[$behavior] = new $behavior($this, $options);
     }
     public function query($query) {
         return $this->connection()->query($query);
@@ -416,30 +430,6 @@ class Model extends Hookable {
     }
     public function escape($value) {
         return $this->connection()->escape($value);
-    }
-    public function __get($field) {
-        if(!array_key_exists($field, $this->schema())):
-            // @todo re-enable this
-            // throw new MissingModelFieldException(array(
-            //     'field' => $field,
-            //     'model' => get_class($this)
-            // ));
-            return $this->{$field};
-        endif;
-        
-        return array_key_exists($field, $this->data) ? $this->data[$field] : null;
-    }
-    public function __set($field, $value) {
-        if(!array_key_exists($field, $this->schema())):
-            // @todo re-enable this
-            // throw new MissingModelFieldException(array(
-            //     'field' => $field,
-            //     'model' => get_class($this)
-            // ));
-            $this->{$field} = $value;
-        endif;
-        
-        $this->data[$field] = $value;
     }
     public function create($data = array()) {
         $self = get_class($this);

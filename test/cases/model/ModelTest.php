@@ -12,6 +12,14 @@ class ModelTest extends DatabaseTestCase {
     }
 
     /**
+     * @testdox __get should throw exception for missing attributes
+     * @expectedException RuntimeException
+     */
+    public function testGetShoudlThrowExceptionForMissingAttributes() {
+        return $this->Users->thisAttributeDoesNotExist;
+    }
+
+    /**
      * @testdox __call should throw exception for missing methods
      * @expectedException BadMethodCallException
      */
