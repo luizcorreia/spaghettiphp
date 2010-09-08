@@ -12,10 +12,9 @@ class Component {
                 return true;
             endif;
         else:
-            throw new MissingComponentException(array(
-                'component' => $name
-            ));
-        endif;        
+            $message = 'The component <code>' . $name . '</code> was not found.';
+            throw new InternalErrorException('Missing Component', 0, $message);
+        endif;
     }
     public function initialize($controller) { }
     public function startup($controller) { }
