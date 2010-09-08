@@ -233,7 +233,7 @@ class Model extends Hookable {
             'totalPages' => ceil($totalRecords / $params['perPage']),
             'perPage' => $params['perPage'],
             'offset' => $offset,
-            'page' => $page
+            'page' => $params['page']
         );
 
         return $this->all($params);
