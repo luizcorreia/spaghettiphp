@@ -28,6 +28,7 @@ require 'lib/core/debug/Debug.php';
 // include core.dispatcher
 require 'lib/core/dispatcher/Dispatcher.php';
 require 'lib/core/dispatcher/Mapper.php';
+// require 'lib/core/dispatcher/OldMapper.php';
 
 // include core.model
 require 'lib/core/model/Model.php';
