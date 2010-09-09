@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @todo remove filters, use only actions
+ */
+
 class Hookable {
     protected $actions = array();
     protected $filters = array();

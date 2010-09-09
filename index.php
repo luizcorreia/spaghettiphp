@@ -137,7 +137,7 @@
         <section id="error">
             <h1>O Spaghetti* não conseguiu iniciar!</h1>
             <?php if(!function_exists("apache_get_version")): ?>
-            <p>Isso se deve ao servidor que você está usando. O Spaghett* já vem pronto para ser usado com o Apache. Se você usa outro servidor, você precisará configurá-lo para funcionar com as regras de reescrita de URL requeridas pelo Spaghetti*.</p>
+            <p>Isso se deve ao servidor que você está usando. O Spaghetti* já vem pronto para ser usado com o Apache. Se você usa outro servidor, você precisará configurá-lo para funcionar com as regras de reescrita de URL requeridas pelo Spaghetti*.</p>
             <?php elseif(!in_array("mod_rewrite", apache_get_modules())): ?>
             <p>Para que o Spaghetti* funcione corretamente, você precisa habilitar o módulo de reescrita de URL do Apache, o <strong>mod_rewrite</strong>.</p>
             <?php else: ?>

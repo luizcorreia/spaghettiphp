@@ -1,10 +1,10 @@
 <?php
 
-class Filesystem{
-    public static $rewrite = array(
-        'Gb' => 1073741824,
-        'Mb' => 1048576,
-        'Kb' => 1024,
+class Filesystem {
+    protected static $rewrite = array(
+        'GB' => 1073741824,
+        'MB' => 1048576,
+        'KB' => 1024,
         'bytes' => 1
     );
 
@@ -27,9 +27,46 @@ class Filesystem{
                 return file_put_contents($file, $content);
         endswitch;
     }
-    public static function getFiles($path = '', $pattern = '*') {
+    public static function copy($source, $destination) {
+        if(self::exists($source)):
+            if(self::isDir($destination)):
+                $destination = $destination . '/' . basename($source);
+            endif;
+            
+            return copy(self::path($source), self::path($destination));
+        endif;
+        
+        return false;
+    }
+    public static function delete($file, $force = true) {
+        $file = self::path($file);
+        
+        if(self::isDir($file)):
+            return self::deleteDir($file, $force);
+        elseif(self::exists($file)):
+            return unlink($file);
+        else:
+            return false;
+        endif;
+    }
+    public static function rename($source, $destination) {
+        $destination = dirname($source) . '/' . $destination;
+
+        return self::move($source, $destination);
+    }
+    public static function move($source, $destination) {
+        $source = self::path($source);
+        $destination = self::path($destination);
+        
+        if(self::exists($source)):
+            return rename($source, $destination);
+        endif;
+
+        return false;
+    }
+    public static function getFiles($path) {
         $path = self::path($path);
-        return glob($path . $pattern);
+        return array_slice(scandir($path), 2);
     }
     public static function size($file, $rewrite = true) {
         if(!self::exists($file)):
@@ -39,81 +76,66 @@ class Filesystem{
         $size = filesize(self::path($file));
 
         if($rewrite):
-            foreach(self::$rewrite as $key => $value):
-                if($size >= $value):
-                    return number_format($size / $value, 2) . ' ' . $key;
-                endif;
-            endforeach;
+            return self::rewriteSize($size);
         else:
             return $size;
         endif;
     }
-    public static function copy($file, $destination) {
-        if(self::exists($file)):
-            $destination = self::path($destination) . '/' . basename($file);
-            return copy(self::path($file), $destination);
-        endif;
-        return false;
+    public static function rewriteSize($size) {
+        foreach(self::$rewrite as $key => $value):
+            if($size >= $value):
+                return number_format($size / $value, 2) . ' ' . $key;
+            endif;
+        endforeach;
     }
     public static function isDir($path) {
         return is_dir(self::path($path));
     }
-    public static function isUploaded($file) {
-        return is_uploaded_file(self::path($file));
-    }
-    public static function delete($file, $deleteIfNotEmpty = true) {
-        if (!self::exists($file)):
-            return false;
-        endif;
-        $file = self::path($file);
-        
-        if(!self::isDir($file)):
-            return unlink($file);
-        else:
-            $dir = rtrim($file, DIRECTORY_SEPARATOR) . '/';
-            $files = self::getFiles($dir);
-        
-            if(!count($files)):
-                return rmdir($dir);
-            else:
-                if(!$deleteIfNotEmpty):
-                    return true;
-                endif;
-                
-                foreach($files as $each):
-                    self::delete($each);
+    public static function deleteDir($dir, $force = true) {
+        $dir = self::path($dir);
+        $files = self::getFiles($dir);
+    
+        if(count($files)):
+            if($force):
+                foreach($files as $file):
+                    self::delete($dir . '/' . $file, $force);
                 endforeach;
-                
-                return self::delete($dir);
+            else:
+                return false;
             endif;
         endif;
+
+        return rmdir($dir);
     }
-    public static function createDir($dir, $mode = 0644) {
+    public static function createDir($dir, $mode = 0755) {
         $dir = self::path($dir);
+
         if(!self::exists($dir)):
             return mkdir($dir, $mode, true);
         endif;
     }
-    public static function rename($file, $newName) {
-        $file = self::path($file);
-        if(self::exists($file)):
-            return rename($file, dirname($file) . '/' . $newName);
-        endif;
-        return false;
+    public static function isUploadedFile($file) {
+        return is_uploaded_file(self::path($file));
+    }
+    public static function moveUploadedFile($name, $destination) {
+        $destination = self::path($destination);
+
+        return move_uploaded_file($name, $destination);
     }
     public static function exists($file) {
         return file_exists(self::path($file));
     }
-    public static function hasPermission($file, $permission = array('execute', 'read', 'write')) {
+    public static function hasPermission($file, $permission = 'rwx') {
         $file = self::path($file);
         $functions = array(
-            'execute' => 'is_executable',
-            'read' => 'is_readable',
-            'write' => 'is_writeable',
+            'x' => 'is_executable',
+            'r' => 'is_readable',
+            'w' => 'is_writeable'
         );
-
-        foreach($permission as $action):
-            if(!$functions[$action]($file)):
+        $permissions = str_split($permission);
+        
+        foreach($permissions as $permission):
+            if(!$functions[$permission]($file)):
                 return false;
             endif;
         endforeach;
@@ -122,14 +144,16 @@ class Filesystem{
     }
     public static function extension($file) {
         $explode = explode('.', $file);
+        
         if(($count = count($explode)) > 1):
             return strtolower($explode[$count - 1]);
         endif;
+        
         return null;
     }
-    public static function path($path, $returnAbsolute = true) {
+    public static function path($path, $absolute = true) {
          if(strpos($path, SPAGHETTI_ROOT) === false && !preg_match('(^[a-z]+:)i', $path, $out)):
-            if($returnAbsolute):
+            if($absolute):
                 $path = SPAGHETTI_ROOT . '/' . $path;
             endif;
         endif;

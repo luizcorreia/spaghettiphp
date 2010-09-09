@@ -48,7 +48,8 @@ class Controller {
         endif;
     }
     public static function hasViewForAction($request) {
-        return Loader::exists('View', $request['controller'] . '/' . $request['action'] . '.' . $request['extension']);
+        $path = 'app/views/' . $request['controller'] . '/' . $request['action'] . '.' . $request['extension'] . '.php';
+        return Filesystem::exists($path);
     }
     public function name() {
         $classname = get_class($this);

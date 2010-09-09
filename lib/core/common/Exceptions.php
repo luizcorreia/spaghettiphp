@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @todo remove SpaghettiException::header and use a Response object instead
+ * @todo enable previous exception
+ */
+
 class SpaghettiException extends Exception {
     protected $status = 500;
     protected $details;
