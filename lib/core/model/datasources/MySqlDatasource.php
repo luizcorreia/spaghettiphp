@@ -49,9 +49,8 @@ class MySqlDatasource extends PdoDatasource {
                 endforeach;
                 $this->schema[$table] = $schema;
             else:
-                throw new MissingTableException(array(
-                    'table' => $table
-                ));
+                $message = 'The table <code>' . $table . '</code> was not found.';
+                throw new InternalErrorException('Missing Table', 0, $message);
             endif;
         endif;
         

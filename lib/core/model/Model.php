@@ -1,6 +1,5 @@
 <?php
 
-require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Connection.php';
 require 'lib/core/model/Relationship.php';
 require 'lib/core/model/Behavior.php';
@@ -102,9 +101,8 @@ class Model extends Hookable {
                 Model::$instances[$name]->connection();
                 Model::$instances[$name]->createRelations();
             else:
-                throw new MissingModelException(array(
-                    'model' => $name
-                ));
+                $message = 'The model <code>' . $name . '</code> was not found.';
+                throw new InternalErrorException('Missing Model', 0, $message);
             endif;
         endif;
 

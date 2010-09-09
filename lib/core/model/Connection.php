@@ -31,7 +31,8 @@ class Connection {
         $self = self::instance();
         if(!array_key_exists($connection, $self->connections)):
             if(!array_key_exists($connection, $self->config)):
-                throw new RuntimeException('Can\'t find "' . $connection . '" database configuration.');
+                $message = 'The database connection <code>' . $connection . '</code> was not found.';
+                throw new InternalErrorException('Missing connection', 0, $message);
             endif;
             $config = $self->config[$connection];
             $self->connections[$connection] = self::create($config);
