@@ -3,7 +3,7 @@
 Connection::add(array(
     'development' => array(
         'driver' => 'MySql',
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'user' => 'root',
         'password' => '',
         'database' => 'spaghetti',
@@ -11,7 +11,7 @@ Connection::add(array(
     ),
     'production' => array(
         'driver' => 'MySql',
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'user' => 'root',
         'password' => '',
         'database' => 'spaghetti',
@@ -19,7 +19,7 @@ Connection::add(array(
     ),
     'test' => array(
         'driver' => 'MySql',
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'user' => 'root',
         'password' => '',
         'database' => 'spaghetti',
