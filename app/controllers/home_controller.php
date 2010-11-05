@@ -7,13 +7,10 @@ class HomeController extends AppController {
     
     public function index() {
         Model::load('Stories');
-        Stories::update(array(
-            'conditions' => array(
-                'id' => 1
-            )
-        ), array(
-            'title' => 'Woops'
-        ));
-        pr(Stories::find(1));
+        $story = Stories::create();
+        $story->title = 'test';
+        $story->save();
+        
+        pr($story);
     }
 }

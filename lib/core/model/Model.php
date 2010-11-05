@@ -26,6 +26,23 @@ class Model {
     protected function __construct($data, $guard = true, $new = true) {
         $this->data = $data;
     }
+
+    public function __set($name, $value) {
+        // @todo shouldn't fail silently
+        $this->data[$name] = $value;
+    }
+    
+    public function __get($name) {
+        $attrs = array('data');
+        
+        foreach($attrs as $attr) {
+            if(array_key_exists($name, $this->{$attr})) {
+                return $this->{$attr}[$name];
+            }
+        }
+        
+        throw new RuntimeException(get_class($this) . '->' . $name . ' does not exist.');
+    }
     
     public static function load($name) {
         $filename = 'app/models/' . Inflector::underscore($name) . '.php';
@@ -125,7 +142,7 @@ class Model {
         return $self::connection()->affectedRows();
     }
 
-    public static function create($data) {
+    public static function create($data = array()) {
         $self = get_called_class();
         return new $self($data);
     }
@@ -282,7 +299,48 @@ class Model {
     }
     
     public function save() {
-        return true;
+        $self = get_class($this);
+        $table = $self::table();
+        
+        // apply modified timestamp
+        $date = date('Y-m-d H:i:s');
+        if(!array_key_exists('modified', $this->data)) {
+            $this->data['modified'] = $date;
+        }
+
+        // verify if the record exists
+        // @todo won't be neccessary anymore
+        if(array_key_exists('id', $this->data) && $self::exists($this->data['id'])) {
+            $exists = true;
+        }
+        else {
+            $exists = false;
+        }
+
+        // apply created timestamp
+        if(!$exists && !array_key_exists('created', $this->data)) {
+            $this->data['created'] = $date;
+        }
+
+        // filter fields that are not in the schema
+        // @todo won't be neccessary anymore
+        $data = array_intersect_key($this->data, $table->schema());
+
+        // update a record if it already exists...
+        if($exists):
+            $save = $self::update(array(
+                'conditions' => array(
+                    $table->primaryKey() => $this->data['id']
+                ),
+                'limit' => 1
+            ), $this->data);
+        // or insert a new one if it doesn't
+        else:
+            $save = $self::insert($this->data);
+            $this->data['id'] = $self::insertId();
+        endif;
+
+        return $save;
     }
     
     public function delete() {
