@@ -6,7 +6,6 @@ class Table {
     protected $table;
     protected $model;
     protected $connection;
-    protected $connected = false;
     protected static $cache = array();
 
     public function __construct($connection, $model) {
@@ -15,9 +14,8 @@ class Table {
     }
 
     public static function load($model) {
-        $model_name = get_class($model);
-        $connection = $model->getConnection();
-        $name = $connection . '.' . $model_name;
+        $connection = $model::connectionName();
+        $name = $connection . '.' . $model;
         
         if(!array_key_exists($name, self::$cache)) {
             self::$cache[$name] = new self($connection, $model);
@@ -32,11 +30,12 @@ class Table {
 
     public function name() {
         if(is_null($this->table)) {
-            $this->table = $this->model->getTable();
+            $model = $this->model;
+            $this->table = $model::tableName();
 
             if(is_null($this->table)) {
                 $database = Connection::config($this->connection);
-                $this->table = $database['prefix'] . Inflector::underscore(get_class($this->model));
+                $this->table = $database['prefix'] . Inflector::underscore($model);
             }
         }
         

@@ -6,7 +6,7 @@ Connection::add(array(
         'host' => 'localhost',
         'user' => 'root',
         'password' => '',
-        'database' => 'spaghetti',
+        'database' => 'rede_radios',
         'prefix' => ''
     ),
     'production' => array(
@@ -28,4 +28,4 @@ Connection::add(array(
 ));
 
 $env = Config::read('App.environment');
-Connection::add('default', Connection::getConfig($env));
+Connection::add('default', Connection::config($env));

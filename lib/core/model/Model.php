@@ -5,7 +5,309 @@ require 'lib/core/model/Table.php';
 require 'lib/core/model/Exceptions.php';
 require 'lib/core/model/Behavior.php';
 
-class Model extends Hookable {
+class Model {
+    protected static $table;
+    protected static $connection = 'default';
+    
+    protected static $belongsTo;
+    protected static $hasOne;
+    protected static $hasMany;
+    protected static $hasAndBelongsToMany;
+    
+    protected static $defaultScope = array();
+    protected static $displayField = null;
+    protected static $perPage = 20;
+    
+    protected static $validates;
+    protected $errors;
+    
+    protected $data;
+    
+    protected function __construct($data, $guard = true, $new = true) {
+        $this->data = $data;
+    }
+    
+    public static function load($name) {
+        $filename = 'app/models/' . Inflector::underscore($name) . '.php';
+        if(!class_exists($name) && Filesystem::exists($filename)) {
+            require_once $filename;
+        }
+
+        if(class_exists($name)) {
+            // Model::$instances[$name] = new $name();
+            // Model::$instances[$name]->createLinks();
+        }
+        else {
+            throw new MissingModelException(array(
+                'model' => $name
+            ));
+        }
+    }
+    
+    public static function tableName() {
+        $self = get_called_class();
+        return $self::$table;
+    }
+
+    public static function connectionName() {
+        $self = get_called_class();
+        return $self::$connection;
+    }
+    
+    protected static function table() {
+        return Table::load(get_called_class());
+    }
+
+    protected static function connection() {
+        $self = get_called_class();
+        return $self::table()->connection();
+    }
+
+    protected static function scope($scope, $params, $defaults = array()) {
+        if(is_array($scope)) {
+            $params = $scope;
+            $scope = 'default';
+        }
+        
+        if(is_null($scope)) {
+            $scope = 'default';
+        }
+        
+        if($scope !== false) {
+            $self = get_called_class();
+            $scope_name = $scope . 'Scope';
+            $scope = $self::$$scope_name;
+        }
+        else {
+            $scope = array();
+        }
+        
+        return array_merge($defaults, $scope, $params);
+    }
+
+    public static function query($sql, $values = array()) {
+        $self = get_called_class();
+        return $self::connection()->query($sql);
+    }
+    
+    public static function fetch($sql, $values = array()) {
+        $self = get_called_class();
+        return $self::connection()->fetchAll($sql);
+    }
+    
+    public static function begin() {
+        $self = get_called_class();
+        return $self::connection()->begin();
+    }
+    
+    public static function commit() {
+        $self = get_called_class();
+        return $self::connection()->commit();
+    }
+    
+    public static function rollback() {
+        $self = get_called_class();
+        return $self::connection()->rollback();
+    }
+    
+    public static function escape($value) {
+        $self = get_called_class();
+        return $self::connection()->escape($value);
+    }
+    
+    public static function insertId() {
+        $self = get_called_class();
+        return $self::connection()->insertId();
+    }
+    
+    public static function affectedRows() {
+        $self = get_called_class();
+        return $self::connection()->affectedRows();
+    }
+
+    public static function create($data) {
+        $self = get_called_class();
+        return new $self($data);
+    }
+    
+    public static function all($scope = null, $params = array()) {
+        $self = get_called_class();
+        $table = $self::table();
+        $defaults = array( 'table' => $table->name() );
+        $params = $self::scope($scope, $params, $defaults);
+
+        $query = $table->connection()->read($params);
+
+        $results = array();
+        while($result = $query->fetch()) {
+            $results []= new $self($result, false, false);
+        }
+
+        return $results;
+    }
+    
+    public static function first($scope = null, $params = array()) {
+        $self = get_called_class();
+        $params['limit'] = 1;
+        $results = $self::all($scope, $params);
+
+        return empty($results) ? null : $results[0];
+    }
+    
+    public static function find($id) {
+        $self = get_called_class();
+        $pk = $self::table()->primaryKey();
+        $params = array(
+            'conditions' => array(
+                $pk => $id
+            )
+        );
+        
+        return $self::first($params);
+    }
+    
+    public static function count($scope = null, $params = array()) {
+        $self = get_called_class();
+        $table = $self::table();
+        $defaults = array( 'table' => $table->name() );
+        $params = $self::scope($scope, $params, $defaults);
+        unset($params['offset'], $params['limit']);
+        
+        return $self::connection()->count($params);
+    }
+    
+    public static function paginate($scope = null, $params = array()) {
+        $self = get_called_class();
+        $count = $self::count($scope, $params);
+
+        $defaults = array(
+            'perPage' => $self::$perPage,
+            'page' => 1
+        );
+        $params = $self::scope($scope, $params, $defaults);
+
+        $params['offset'] = ($params['page'] - 1) * $params['perPage'];
+        $params['limit'] = $params['perPage'];
+
+        // $this->pagination = array(
+        //     'totalRecords' => $count,
+        //     'totalPages' => ceil($count / $params['perPage']),
+        //     'perPage' => $params['perPage'],
+        //     'offset' => $params['offset'],
+        //     'page' => $params['page']
+        // );
+
+        return $self::all(false, $params);
+    }
+    
+    public static function toList($scope = null, $params = array()) {
+        $self = get_called_class();
+        $table = $self::table();
+        $defaults = array(
+            'key' => $table->primaryKey(),
+            'displayField' => $self::$displayField,
+            'table' => $table->name()
+        );
+        $params = $self::scope($scope, $params, $defaults);
+        
+        if(!array_key_exists('fields', $params)) {
+            $params['fields'] = array_merge(
+                (array) $params['key'],
+                (array) $params['displayField']
+            );
+        }
+
+        $all = $self::connection()->read($params);
+
+        $results = array();
+        while($result = $all->fetch()) {
+            if(is_array($params['displayField'])) {
+                $keys = array_flip($params['displayField']);
+                $value = array_intersect_key($result, $keys);
+            }
+            else {
+                $value = $result[$params['displayField']];
+            }
+            
+            $results[$result[$params['key']]] = $value;
+        }
+
+        return $results;
+    }
+    
+    public static function exists($conditions) {
+        $self = get_called_class();
+        
+        if(is_numeric($conditions)) {
+            $pk = $self::table()->primaryKey();
+            $conditions = array(
+                $pk => $conditions
+            );
+        }
+        
+        return (bool) $self::count(array(
+            'conditions' => $conditions
+        ));
+    }
+    
+    public static function update($params, $data) {
+        $self = get_called_class();
+        $table = $self::table();
+        $params += array(
+            'values' => $data,
+            'table' => $table->name()
+        );
+
+        return $table->connection()->update($params);
+    }
+    
+    public static function insert($data) {
+        $self = get_called_class();
+        $table = $self::table();
+        $params = array(
+            'values' => $data,
+            'table' => $table->name()
+        );
+
+        return $table->connection()->create($params);
+    }
+
+    public static function deleteAll($scope = null, $params = array()) {
+        $self = get_called_class();
+        $table = $self::table();
+        $defaults = array( 'table' => $table->name() );
+        $params = $self::scope($scope, $params, $defaults);
+        
+        return $self::connection()->delete($params);
+    }
+    
+    public function save() {
+        return true;
+    }
+    
+    public function delete() {
+        $self = get_class($this);
+        $pk = $self::table()->primaryKey();
+        $params = array(
+            'conditions' => array(
+                $pk => $id
+            ),
+            'limit' => 1
+        );
+        
+        if($self::exists($id)) {
+            return $self::deleteAll($params);
+        }
+
+        return false;
+    }
+    
+    public function isValid() {
+        return true;
+    }
+}
+
+class OldModel extends Hookable {
     public $id;
 
     public $associations = array(
