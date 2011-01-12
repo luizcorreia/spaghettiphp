@@ -33,16 +33,17 @@ class MySqlDatasource extends PdoDatasource {
         return $this->sources;
     }
     public function describe($table) {
-        if(!isset($this->schema[$table])):
+        if(!isset($this->schema[$table])) {
             $columns = $this->fetchAll('SHOW COLUMNS FROM ' . $table);
             $schema = array();
-            foreach($columns as $column):
+            foreach($columns as $column) {
+                $column = $this->column($column);
                 $schema[$column['Field']] = array(
                     'key' => $column['Key']
                 );
-            endforeach;
+            }
             $this->schema[$table] = $schema;
-        endif;
+        }
         
         return $this->schema[$table];
     }
